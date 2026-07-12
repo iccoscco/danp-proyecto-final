@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.savebite"
+    namespace = "com.example.app"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.savebite"
+        applicationId = "com.example.com.savebite.app"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
