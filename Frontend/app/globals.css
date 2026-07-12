@@ -14,6 +14,75 @@ a {
   text-decoration: none;
 }
 
+button,
+input {
+  font: inherit;
+}
+
+.pagina-login {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+.formulario-login {
+  display: grid;
+  width: min(100%, 400px);
+  gap: 22px;
+  padding: 40px;
+  border: 1px solid #edf1f7;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 12px 32px rgb(21 34 50 / 8%);
+}
+
+.campo-login {
+  display: grid;
+  gap: 8px;
+}
+
+.campo-login label {
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.campo-login input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  color: #172033;
+  outline: none;
+}
+
+.campo-login input:focus {
+  border-color: #1769e0;
+  box-shadow: 0 0 0 3px rgb(23 105 224 / 12%);
+}
+
+.error-login {
+  margin: -6px 0 0;
+  color: #c2410c;
+  font-size: 14px;
+}
+
+.boton-login {
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #1769e0;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.boton-login:hover {
+  background: #1158bd;
+}
+
 .panel-dashboard {
   min-height: 100vh;
 }
