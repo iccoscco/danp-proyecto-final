@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 type LayoutDashboardProps = {
   children: ReactNode;
+  enlaceActivo?: string;
 };
 
 const enlaces = [
@@ -14,7 +15,10 @@ const enlaces = [
   { etiqueta: "Perfil", href: "/perfil" },
 ];
 
-export default function LayoutDashboard({ children }: LayoutDashboardProps) {
+export default function LayoutDashboard({
+  children,
+  enlaceActivo = "/dashboard",
+}: LayoutDashboardProps) {
   return (
     <div className="panel-dashboard">
       <aside className="sidebar" aria-label="Navegación principal">
@@ -25,7 +29,7 @@ export default function LayoutDashboard({ children }: LayoutDashboardProps) {
         <nav className="navegacion">
           {enlaces.map((enlace) => (
             <Link
-              className={enlace.href === "/dashboard" ? "enlace activo" : "enlace"}
+              className={enlace.href === enlaceActivo ? "enlace activo" : "enlace"}
               href={enlace.href}
               key={enlace.href}
             >
