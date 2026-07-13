@@ -19,7 +19,12 @@ fun InicioScreen() {
     ) {
 
         Text(
-            text = "Bienvenido a SaveBite 🌱",
+            text = "🌱 SaveBite",
+            style = MaterialTheme.typography.headlineLarge
+        )
+
+        Text(
+            text = "¡Bienvenido!",
             style = MaterialTheme.typography.headlineMedium
         )
 

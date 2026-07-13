@@ -1,15 +1,8 @@
 package com.example.app.interfaz.pantallas.inicioSesion
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -30,7 +23,12 @@ fun InicioSesionScreen(
         verticalArrangement = Arrangement.Center
     ) {
 
-        Text("Iniciar sesión")
+        Text(
+            text = "Iniciar Sesión",
+            style = MaterialTheme.typography.headlineMedium
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         OutlinedTextField(
             value = correo,
@@ -39,12 +37,16 @@ fun InicioSesionScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.height(12.dp))
+
         OutlinedTextField(
             value = contrasena,
             onValueChange = { contrasena = it },
             label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         Button(
             modifier = Modifier.fillMaxWidth(),
@@ -55,8 +57,9 @@ fun InicioSesionScreen(
             Text("Ingresar")
         }
 
-        Button(
-            modifier = Modifier.fillMaxWidth(),
+        Spacer(modifier = Modifier.height(10.dp))
+
+        TextButton(
             onClick = {
                 navController.navigate(Rutas.REGISTRO)
             }

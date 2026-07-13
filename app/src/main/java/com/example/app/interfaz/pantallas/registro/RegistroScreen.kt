@@ -1,13 +1,7 @@
 package com.example.app.interfaz.pantallas.registro
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,9 +13,7 @@ fun RegistroScreen(
 ) {
 
     var nombre by remember { mutableStateOf("") }
-
     var correo by remember { mutableStateOf("") }
-
     var contrasena by remember { mutableStateOf("") }
 
     Column(
@@ -31,7 +23,12 @@ fun RegistroScreen(
         verticalArrangement = Arrangement.Center
     ) {
 
-        Text("Registro")
+        Text(
+            text = "Registro",
+            style = MaterialTheme.typography.headlineMedium
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         OutlinedTextField(
             value = nombre,
@@ -40,12 +37,16 @@ fun RegistroScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.height(12.dp))
+
         OutlinedTextField(
             value = correo,
             onValueChange = { correo = it },
             label = { Text("Correo") },
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
             value = contrasena,
@@ -54,17 +55,15 @@ fun RegistroScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.height(20.dp))
+
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-
                 navController.popBackStack()
-
             }
         ) {
-
             Text("Registrarse")
-
         }
 
     }

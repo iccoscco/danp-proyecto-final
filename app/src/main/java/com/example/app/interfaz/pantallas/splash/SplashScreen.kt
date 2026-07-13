@@ -47,7 +47,7 @@ fun SplashScreen(
         )
 
         Text(
-            text = "Rescatando alimentos,\ncuidando el planeta."
+            text = "Reduce el desperdicio de alimentos"
         )
 
     }
