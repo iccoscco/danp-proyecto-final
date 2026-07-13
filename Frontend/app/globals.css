@@ -226,6 +226,57 @@ input {
   box-shadow: 0 4px 16px rgb(21 34 50 / 4%);
 }
 
+.tarjeta-perfil {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  max-width: 720px;
+  padding: 32px;
+  border: 1px solid #edf1f7;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgb(21 34 50 / 4%);
+}
+
+.avatar-perfil {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  font-size: 24px;
+}
+
+.datos-perfil {
+  display: grid;
+  width: 100%;
+}
+
+.fila-perfil {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 20px;
+  padding: 14px 0;
+  border-bottom: 1px solid #edf1f7;
+}
+
+.fila-perfil:first-child {
+  padding-top: 0;
+}
+
+.fila-perfil:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.fila-perfil span {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.fila-perfil strong {
+  color: #172033;
+  font-size: 14px;
+}
+
 .buscador-productos {
   width: min(100%, 320px);
   margin-bottom: 24px;
@@ -349,6 +400,12 @@ input {
 .formulario-producto input:focus {
   border-color: #1769e0;
   box-shadow: 0 0 0 3px rgb(23 105 224 / 12%);
+}
+
+.formulario-producto input[readonly] {
+  cursor: not-allowed;
+  background: #f8fafc;
+  color: #64748b;
 }
 
 .etiqueta-seccion {
@@ -491,6 +548,11 @@ tbody tr:last-child td {
     align-items: flex-start;
     flex-direction: column;
   }
+
+  .tarjeta-perfil {
+    align-items: center;
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
@@ -500,5 +562,10 @@ tbody tr:last-child td {
 
   .seccion-pedidos {
     padding: 20px;
+  }
+
+  .fila-perfil {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 }
