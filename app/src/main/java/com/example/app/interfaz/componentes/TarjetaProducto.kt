@@ -1,42 +1,84 @@
 package com.example.app.interfaz.componentes
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.example.app.modelos.Producto
 
 @Composable
-fun TarjetaProducto(
-    nombre: String,
-    precio: String
-) {
+fun TarjetaProducto(producto: Producto) {
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(18.dp)
     ) {
 
-        Column(
+        Row(
             modifier = Modifier.padding(16.dp)
         ) {
 
-            Text(
-                text = nombre,
-                style = MaterialTheme.typography.titleMedium
+            Image(
+                painter = painterResource(producto.imagen),
+                contentDescription = producto.nombre,
+                modifier = Modifier
+                    .size(90.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-            Text(
-                text = precio,
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
+                Text(
+                    producto.nombre,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                AssistChip(
+                    onClick = {},
+                    label = {
+                        Text(producto.descuento)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    "S/. ${producto.precioOriginal}",
+                    textDecoration = TextDecoration.LineThrough
+                )
+
+                Text(
+                    "S/. ${producto.precioOferta}",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Button(
+                    onClick = { }
+                ) {
+                    Text("Agregar")
+                }
+
+            }
 
         }
 

@@ -2,18 +2,28 @@ package com.example.app.interfaz.pantallas.inicio
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.app.datos.RepositorioProductosFalso
 import com.example.app.interfaz.componentes.TarjetaProducto
 
 @Composable
 fun InicioScreen() {
 
-    var busqueda by remember { mutableStateOf("") }
+    var busqueda by remember {
+        mutableStateOf("")
+    }
+
+    val productos = RepositorioProductosFalso.obtenerProductos()
+
+    val productosFiltrados = productos.filter {
+        it.nombre.contains(busqueda, ignoreCase = true)
+    }
 
     Column(
         modifier = Modifier
@@ -27,7 +37,7 @@ fun InicioScreen() {
         )
 
         Text(
-            text = "Encuentra alimentos con descuento",
+            text = "Rescatemos alimentos, reduzcamos el desperdicio.",
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -49,22 +59,14 @@ fun InicioScreen() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        LazyColumn {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
 
-            item {
-                TarjetaProducto("🥗 Ensalada César", "S/ 8.50")
-            }
+            items(productosFiltrados) { producto ->
 
-            item {
-                TarjetaProducto("🍞 Pan Integral", "S/ 3.00")
-            }
+                TarjetaProducto(producto)
 
-            item {
-                TarjetaProducto("☕ Café Americano", "S/ 5.00")
-            }
-
-            item {
-                TarjetaProducto("🍎 Manzanas", "S/ 6.00")
             }
 
         }

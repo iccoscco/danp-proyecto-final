@@ -1,4 +1,17 @@
 package com.example.app.modelos
 
-class Producto {
-}
+data class Producto(
+
+    val id: Int,
+
+    val nombre: String,
+
+    val precioOriginal: Double,
+
+    val precioOferta: Double,
+
+    val descuento: String,
+
+    val imagen: Int
+
+)
