@@ -1,4 +1,5 @@
 import LayoutDashboard from "../../componentes/LayoutDashboard";
+import styles from "./Ofertas.module.css";
 
 const ofertas = [
   { id: 1, nombre: "Leche amarilla", descuento: "20%", vigencia: "15 - 31 Jul 2026", estado: "Activa" },
@@ -10,18 +11,18 @@ const ofertas = [
 export default function OfertasPage() {
   return (
     <LayoutDashboard enlaceActivo="/ofertas">
-      <section className="encabezado-modulo">
+      <section className={styles.encabezado}>
         <div>
-          <p className="etiqueta-seccion">Promociones</p>
+          <p className={styles.etiqueta}>Promociones</p>
           <h1>Ofertas</h1>
         </div>
-        <button className="boton-primario" type="button">Agregar oferta</button>
+        <button className={styles.botonPrimario} type="button">Agregar oferta</button>
       </section>
 
-      <section className="panel-listado" aria-label="Listado de ofertas">
-        <input aria-label="Buscar ofertas" className="buscador-listado" placeholder="Buscar ofertas" type="search" />
-        <div className="contenedor-tabla">
-          <table>
+      <section className={styles.panel} aria-label="Listado de ofertas">
+        <input aria-label="Buscar ofertas" className={styles.buscador} placeholder="Buscar ofertas" type="search" />
+        <div className={styles.contenedorTabla}>
+          <table className={styles.tabla}>
             <thead>
               <tr>
                 <th>Oferta</th>
@@ -39,9 +40,9 @@ export default function OfertasPage() {
                   <td>{oferta.vigencia}</td>
                   <td>{oferta.estado}</td>
                   <td>
-                    <div className="acciones-listado">
-                      <button className="boton-secundario" type="button">Editar</button>
-                      <button className="boton-eliminar" type="button">Eliminar</button>
+                    <div className={styles.acciones}>
+                      <button className={styles.botonSecundario} type="button">Editar</button>
+                      <button className={styles.botonEliminar} type="button">Eliminar</button>
                     </div>
                   </td>
                 </tr>

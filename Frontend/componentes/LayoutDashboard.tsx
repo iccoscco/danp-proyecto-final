@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import styles from "./LayoutDashboard.module.css";
 
 type LayoutDashboardProps = {
   children: ReactNode;
@@ -20,16 +21,16 @@ export default function LayoutDashboard({
   enlaceActivo = "/dashboard",
 }: LayoutDashboardProps) {
   return (
-    <div className="panel-dashboard">
-      <aside className="sidebar" aria-label="Navegación principal">
-        <Link className="marca" href="/dashboard">
+    <div className={styles.panel}>
+      <aside className={styles.sidebar} aria-label="Navegación principal">
+        <Link className={styles.marca} href="/dashboard">
           Panel Admin
         </Link>
 
-        <nav className="navegacion">
+        <nav className={styles.navegacion}>
           {enlaces.map((enlace) => (
             <Link
-              className={enlace.href === enlaceActivo ? "enlace activo" : "enlace"}
+              className={enlace.href === enlaceActivo ? `${styles.enlace} ${styles.activo}` : styles.enlace}
               href={enlace.href}
               key={enlace.href}
             >
@@ -38,19 +39,19 @@ export default function LayoutDashboard({
           ))}
         </nav>
 
-        <Link className="cerrar-sesion" href="/login">
+        <Link className={styles.cerrarSesion} href="/login">
           Cerrar sesión
         </Link>
       </aside>
 
-      <div className="contenido-panel">
-        <header className="navbar">
+      <div className={styles.contenido}>
+        <header className={styles.navbar}>
           <p>Panel administrativo</p>
-          <div className="avatar" aria-label="Perfil de usuario">
+          <div className={styles.avatar} aria-label="Perfil de usuario">
             A
           </div>
         </header>
-        <main className="contenido-principal">{children}</main>
+        <main className={styles.principal}>{children}</main>
       </div>
     </div>
   );

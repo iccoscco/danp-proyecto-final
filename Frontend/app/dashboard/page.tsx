@@ -1,4 +1,5 @@
 import LayoutDashboard from "../../componentes/LayoutDashboard";
+import styles from "./Dashboard.module.css";
 
 const resumen = [
   { etiqueta: "Productos registrados", valor: "128" },
@@ -17,26 +18,26 @@ const ultimosPedidos = [
 export default function DashboardPage() {
   return (
     <LayoutDashboard>
-      <section className="encabezado-dashboard">
+      <section className={styles.encabezado}>
         <div>
-          <p className="etiqueta-seccion">Vista general</p>
+          <p className={styles.etiqueta}>Vista general</p>
           <h1>Dashboard</h1>
         </div>
       </section>
 
-      <section className="tarjetas-resumen" aria-label="Resumen general">
+      <section className={styles.tarjetas} aria-label="Resumen general">
         {resumen.map((item) => (
-          <article className="tarjeta-resumen" key={item.etiqueta}>
+          <article className={styles.tarjeta} key={item.etiqueta}>
             <p>{item.etiqueta}</p>
             <strong>{item.valor}</strong>
           </article>
         ))}
       </section>
 
-      <section className="seccion-pedidos" aria-labelledby="ultimos-pedidos">
+      <section className={styles.pedidos} aria-labelledby="ultimos-pedidos">
         <h2 id="ultimos-pedidos">Últimos pedidos</h2>
-        <div className="contenedor-tabla">
-          <table>
+        <div className={styles.contenedorTabla}>
+          <table className={styles.tabla}>
             <thead>
               <tr>
                 <th>Pedido</th>
@@ -52,7 +53,7 @@ export default function DashboardPage() {
                   <td>{pedido.cliente}</td>
                   <td>{pedido.total}</td>
                   <td>
-                    <span className="estado-pedido">{pedido.estado}</span>
+                    <span className={styles.estado}>{pedido.estado}</span>
                   </td>
                 </tr>
               ))}

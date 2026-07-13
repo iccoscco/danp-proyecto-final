@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import styles from "./Login.module.css";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,14 +23,14 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="pagina-login">
-      <form className="formulario-login" onSubmit={manejarEnvio}>
+    <main className={styles.pagina}>
+      <form className={styles.formulario} onSubmit={manejarEnvio}>
         <div>
-          <p className="etiqueta-seccion">Panel administrativo</p>
+          <p className={styles.etiqueta}>Panel administrativo</p>
           <h1>Iniciar sesión</h1>
         </div>
 
-        <div className="campo-login">
+        <div className={styles.campo}>
           <label htmlFor="usuario">Usuario</label>
           <input
             id="usuario"
@@ -40,7 +41,7 @@ export default function LoginPage() {
           />
         </div>
 
-        <div className="campo-login">
+        <div className={styles.campo}>
           <label htmlFor="contrasena">Contraseña</label>
           <input
             id="contrasena"
@@ -52,9 +53,9 @@ export default function LoginPage() {
           />
         </div>
 
-        {error && <p className="error-login" role="alert">{error}</p>}
+        {error && <p className={styles.error} role="alert">{error}</p>}
 
-        <button className="boton-login" type="submit">
+        <button className={styles.boton} type="submit">
           Ingresar
         </button>
       </form>

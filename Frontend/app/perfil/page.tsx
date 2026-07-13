@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import LayoutDashboard from "../../componentes/LayoutDashboard";
+import styles from "./Perfil.module.css";
 
 const datosPerfil = [
   { etiqueta: "Nombre", valor: "Administrador" },
@@ -20,21 +21,21 @@ export default function PerfilPage() {
 
   return (
     <LayoutDashboard enlaceActivo="/perfil">
-      <section className="encabezado-modulo">
+      <section className={styles.encabezado}>
         <div>
-          <p className="etiqueta-seccion">Cuenta</p>
+          <p className={styles.etiqueta}>Cuenta</p>
           <h1>Perfil</h1>
         </div>
-        <button className="boton-primario" onClick={() => setModalAbierto(true)} type="button">
+        <button className={styles.botonPrimario} onClick={() => setModalAbierto(true)} type="button">
           Editar Perfil
         </button>
       </section>
 
-      <section className="tarjeta-perfil" aria-label="Información de perfil">
-        <div className="avatar avatar-perfil" aria-hidden="true">A</div>
-        <div className="datos-perfil">
+      <section className={styles.tarjeta} aria-label="Información de perfil">
+        <div className={styles.avatar} aria-hidden="true">A</div>
+        <div className={styles.datos}>
           {datosPerfil.map((dato) => (
-            <div className="fila-perfil" key={dato.etiqueta}>
+            <div className={styles.fila} key={dato.etiqueta}>
               <span>{dato.etiqueta}</span>
               <strong>{dato.valor}</strong>
             </div>
@@ -43,13 +44,13 @@ export default function PerfilPage() {
       </section>
 
       {modalAbierto && (
-        <div className="fondo-modal" role="presentation">
-          <section aria-labelledby="titulo-modal-perfil" className="modal-producto" role="dialog">
-            <div className="cabecera-modal">
+        <div className={styles.fondoModal} role="presentation">
+          <section aria-labelledby="titulo-modal-perfil" className={styles.modal} role="dialog">
+            <div className={styles.cabeceraModal}>
               <h2 id="titulo-modal-perfil">Editar perfil</h2>
               <button
                 aria-label="Cerrar modal"
-                className="cerrar-modal"
+                className={styles.cerrarModal}
                 onClick={() => setModalAbierto(false)}
                 type="button"
               >
@@ -57,7 +58,7 @@ export default function PerfilPage() {
               </button>
             </div>
 
-            <form className="formulario-producto" onSubmit={guardarPerfil}>
+            <form className={styles.formulario} onSubmit={guardarPerfil}>
               <label>
                 Nombre
                 <input defaultValue="Administrador" name="nombre" required />
@@ -78,7 +79,7 @@ export default function PerfilPage() {
                 Rol
                 <input defaultValue="Administrador" name="rol" readOnly />
               </label>
-              <button className="boton-primario" type="submit">Guardar</button>
+              <button className={styles.botonPrimario} type="submit">Guardar</button>
             </form>
           </section>
         </div>

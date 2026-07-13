@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import LayoutDashboard from "../../componentes/LayoutDashboard";
+import styles from "./Productos.module.css";
 
 const productos = [
   { id: 1, nombre: "Yogur natural", categoria: "Lácteos", precio: "S/ 8.50", stock: 42, vencimiento: "18 Jul 2026" },
@@ -20,26 +21,26 @@ export default function ProductosPage() {
 
   return (
     <LayoutDashboard enlaceActivo="/productos">
-      <section className="encabezado-modulo">
+      <section className={styles.encabezado}>
         <div>
-          <p className="etiqueta-seccion">Catálogo</p>
+          <p className={styles.etiqueta}>Catálogo</p>
           <h1>Productos</h1>
         </div>
-        <button className="boton-primario" onClick={() => setModalAbierto(true)} type="button">
+        <button className={styles.botonPrimario} onClick={() => setModalAbierto(true)} type="button">
           Nuevo Producto
         </button>
       </section>
 
-      <section className="panel-productos" aria-label="Listado de productos">
+      <section className={styles.panel} aria-label="Listado de productos">
         <input
           aria-label="Buscar productos"
-          className="buscador-productos"
+          className={styles.buscador}
           placeholder="Buscar productos"
           type="search"
         />
 
-        <div className="contenedor-tabla">
-          <table>
+        <div className={styles.contenedorTabla}>
+          <table className={styles.tabla}>
             <thead>
               <tr>
                 <th>Producto</th>
@@ -59,9 +60,9 @@ export default function ProductosPage() {
                   <td>{producto.stock}</td>
                   <td>{producto.vencimiento}</td>
                   <td>
-                    <div className="acciones-producto">
-                      <button className="boton-secundario" type="button">Editar</button>
-                      <button className="boton-eliminar" type="button">Eliminar</button>
+                    <div className={styles.acciones}>
+                      <button className={styles.botonSecundario} type="button">Editar</button>
+                      <button className={styles.botonEliminar} type="button">Eliminar</button>
                     </div>
                   </td>
                 </tr>
@@ -72,13 +73,13 @@ export default function ProductosPage() {
       </section>
 
       {modalAbierto && (
-        <div className="fondo-modal" role="presentation">
-          <section aria-labelledby="titulo-modal-producto" className="modal-producto" role="dialog">
-            <div className="cabecera-modal">
+        <div className={styles.fondoModal} role="presentation">
+          <section aria-labelledby="titulo-modal-producto" className={styles.modal} role="dialog">
+            <div className={styles.cabeceraModal}>
               <h2 id="titulo-modal-producto">Nuevo producto</h2>
               <button
                 aria-label="Cerrar modal"
-                className="cerrar-modal"
+                className={styles.cerrarModal}
                 onClick={() => setModalAbierto(false)}
                 type="button"
               >
@@ -86,7 +87,7 @@ export default function ProductosPage() {
               </button>
             </div>
 
-            <form className="formulario-producto" onSubmit={guardarProducto}>
+            <form className={styles.formulario} onSubmit={guardarProducto}>
               <label>
                 Nombre
                 <input name="nombre" required />
@@ -107,7 +108,7 @@ export default function ProductosPage() {
                 Fecha de vencimiento
                 <input name="vencimiento" required type="date" />
               </label>
-              <button className="boton-primario" type="submit">Guardar</button>
+              <button className={styles.botonPrimario} type="submit">Guardar</button>
             </form>
           </section>
         </div>
