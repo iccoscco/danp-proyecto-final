@@ -1,1 +1,17 @@
-"""Business services will live here."""
+"""Services that encapsulate repository CRUD operations."""
+
+from app.services.categoria import CategoriaService
+from app.services.detalle_pedido import DetallePedidoService
+from app.services.oferta import OfertaService
+from app.services.pedido import PedidoService
+from app.services.producto import ProductoService
+from app.services.usuario import UsuarioService
+
+__all__ = [
+    "CategoriaService",
+    "DetallePedidoService",
+    "OfertaService",
+    "PedidoService",
+    "ProductoService",
+    "UsuarioService",
+]
