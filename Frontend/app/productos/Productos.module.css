@@ -92,6 +92,24 @@
   border-bottom: 0;
 }
 
+.imagenProducto {
+  width: 52px;
+  height: 52px;
+  display: block;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.sinImagen,
+.estadoTabla {
+  color: var(--color-texto-secundario);
+}
+
+.estadoTabla {
+  padding: 28px !important;
+  text-align: center;
+}
+
 .acciones {
   display: flex;
   gap: 8px;
@@ -184,6 +202,26 @@
 .formulario input:focus {
   border-color: var(--color-azul);
   box-shadow: 0 0 0 3px rgb(23 105 224 / 12%);
+}
+
+.ayudaImagen,
+.mensajeExito,
+.mensajeError {
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+
+.ayudaImagen {
+  margin-top: -8px;
+  color: var(--color-texto-secundario);
+}
+
+.mensajeExito {
+  color: #15803d;
+}
+
+.mensajeError {
+  color: #c2410c;
 }
 
 @media (max-width: 760px) {

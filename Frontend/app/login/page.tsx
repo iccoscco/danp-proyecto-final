@@ -4,22 +4,38 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./Login.module.css";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
 export default function LoginPage() {
   const router = useRouter();
-  const [usuario, setUsuario] = useState("");
+  const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(false);
 
-  function manejarEnvio(evento: FormEvent<HTMLFormElement>) {
+  async function manejarEnvio(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
+    setCargando(true);
+    setError("");
 
-    if (usuario === "admin" && contrasena === "1234") {
-      setError("");
+    try {
+      const respuesta = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo, contrasena }),
+      });
+      const cuerpo = await respuesta.json().catch(() => null);
+      if (!respuesta.ok) {
+        throw new Error(cuerpo?.detail ?? "No se pudo iniciar sesión.");
+      }
+
+      window.localStorage.setItem("access_token", cuerpo.access_token);
       router.push("/dashboard");
-      return;
+    } catch (causa) {
+      setError(causa instanceof Error ? causa.message : "No se pudo iniciar sesión.");
+    } finally {
+      setCargando(false);
     }
-
-    setError("Usuario o contraseña incorrectos.");
   }
 
   return (
@@ -31,13 +47,14 @@ export default function LoginPage() {
         </div>
 
         <div className={styles.campo}>
-          <label htmlFor="usuario">Usuario</label>
+          <label htmlFor="correo">Correo</label>
           <input
-            id="usuario"
-            name="usuario"
-            onChange={(evento) => setUsuario(evento.target.value)}
+            id="correo"
+            name="correo"
+            onChange={(evento) => setCorreo(evento.target.value)}
             required
-            value={usuario}
+            type="email"
+            value={correo}
           />
         </div>
 
@@ -55,8 +72,8 @@ export default function LoginPage() {
 
         {error && <p className={styles.error} role="alert">{error}</p>}
 
-        <button className={styles.boton} type="submit">
-          Ingresar
+        <button className={styles.boton} disabled={cargando} type="submit">
+          {cargando ? "Ingresando..." : "Ingresar"}
         </button>
       </form>
     </main>

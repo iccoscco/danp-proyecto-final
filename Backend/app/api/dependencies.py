@@ -2,21 +2,16 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.orm import Session
-
 from app.core.security import decode_access_token
-from app.database.session import get_db
-from app.models.usuario import Usuario
-from app.services.usuario import UsuarioService
-from app.repositories.usuario import UsuarioRepository
+from app.core.supabase import get_supabase_client
+from app.repositories.supabase_usuario import SupabaseUsuarioRepository
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
-    db: Annotated[Session, Depends(get_db)],
-) -> Usuario:
+) -> dict[str, object]:
     unauthorized = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="No autenticado",
@@ -32,8 +27,7 @@ def get_current_user(
     except (KeyError, TypeError, ValueError):
         raise unauthorized
 
-    user_service = UsuarioService(UsuarioRepository(db))
-    user = user_service.get_by_id(user_id)
+    user = SupabaseUsuarioRepository(get_supabase_client()).get_by_id(user_id)
     if user is None:
         raise unauthorized
     return user

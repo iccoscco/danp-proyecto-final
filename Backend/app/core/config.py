@@ -19,8 +19,12 @@ class Settings:
     jwt_secret_key: str = os.getenv("JWT_SECRET_KEY", "change-this-secret-key")
     jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
     access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
-    admin_email: str | None = os.getenv("ADMIN_EMAIL")
-    admin_password: str | None = os.getenv("ADMIN_PASSWORD")
+    
+    supabase_url: str | None = os.getenv("SUPABASE_URL")
+    supabase_key: str | None = os.getenv("SUPABASE_KEY")
+    supabase_products_bucket: str = os.getenv("SUPABASE_PRODUCTS_BUCKET", "productos")
+    master_admin_email: str = os.getenv("MASTER_ADMIN_EMAIL", "mika@savebite.com")
+    master_admin_password: str = os.getenv("MASTER_ADMIN_PASSWORD", "123456")
     frontend_origins: list[str] | None = None
 
     def __post_init__(self) -> None:

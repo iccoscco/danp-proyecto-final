@@ -9,7 +9,7 @@ class ProductoCreate(BaseModel):
     precio: Decimal
     stock: int
     fecha_vencimiento: date
-    categoria_id: int
+    categoria: str
 
 
 class ProductoUpdate(BaseModel):
@@ -17,6 +17,7 @@ class ProductoUpdate(BaseModel):
     precio: Decimal | None = None
     stock: int | None = None
     fecha_vencimiento: date | None = None
+    categoria: str | None = None
     categoria_id: int | None = None
 
 
@@ -29,3 +30,5 @@ class ProductoResponse(BaseModel):
     stock: int
     fecha_vencimiento: date
     categoria_id: int
+    categoria: str
+    imagen_url: str | None = None

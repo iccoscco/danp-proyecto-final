@@ -3,9 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.bootstrap import create_admin_user
+from app.core.bootstrap import create_master_admin
 from app.core.config import settings
-from app.database.session import SessionLocal
 from app.routers import (
     auth_router,
     categorias_router,
@@ -18,11 +17,7 @@ from app.routers import (
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    db = SessionLocal()
-    try:
-        create_admin_user(db)
-    finally:
-        db.close()
+    create_master_admin()
     yield
 
 

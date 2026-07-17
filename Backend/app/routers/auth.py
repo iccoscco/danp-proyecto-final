@@ -1,18 +1,16 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-
-from app.database.session import get_db
-from app.repositories.usuario import UsuarioRepository
+from app.core.supabase import get_supabase_client
+from app.repositories.supabase_usuario import SupabaseUsuarioRepository
 from app.schemas.auth import LoginRequest, TokenResponse
 from app.services.auth import AuthService
 
 router = APIRouter(prefix="/auth", tags=["autenticación"])
 
 
-def get_service(db: Annotated[Session, Depends(get_db)]) -> AuthService:
-    return AuthService(UsuarioRepository(db))
+def get_service() -> AuthService:
+    return AuthService(SupabaseUsuarioRepository(get_supabase_client()))
 
 
 Service = Annotated[AuthService, Depends(get_service)]

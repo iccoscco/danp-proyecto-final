@@ -23,6 +23,8 @@ class Producto(Base):
     precio: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     stock: Mapped[int] = mapped_column(Integer, nullable=False)
     fecha_vencimiento: Mapped[date] = mapped_column(Date, nullable=False)
+    imagen_url: Mapped[str | None] = mapped_column(String(500))
+    imagen_path: Mapped[str | None] = mapped_column(String(500))
     categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.id"), nullable=False)
 
     categoria: Mapped[Categoria] = relationship(back_populates="productos")

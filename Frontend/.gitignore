@@ -4,3 +4,4 @@ out/
 *.log
 *.tsbuildinfo
 .env*
+!.env.local.example

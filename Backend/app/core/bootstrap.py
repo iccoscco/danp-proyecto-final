@@ -1,21 +1,17 @@
-from sqlalchemy.orm import Session
-
 from app.core.config import settings
-from app.repositories.usuario import UsuarioRepository
-from app.services.usuario import UsuarioService
+from app.core.security import get_password_hash
+from app.core.supabase import get_supabase_client
+from app.repositories.supabase_usuario import SupabaseUsuarioRepository
 
 
-def create_admin_user(db: Session) -> None:
-    if not settings.admin_email or not settings.admin_password:
-        return
-
-    service = UsuarioService(UsuarioRepository(db))
-    if service.get_by_correo(settings.admin_email) is None:
-        service.create(
+def create_master_admin() -> None:
+    repository = SupabaseUsuarioRepository(get_supabase_client())
+    if repository.get_by_correo(settings.master_admin_email) is None:
+        repository.create(
             {
-                "nombre": "Administrador",
-                "correo": settings.admin_email,
-                "contrasena": settings.admin_password,
+                "nombre": "Mika",
+                "correo": settings.master_admin_email,
+                "password_hash": get_password_hash(settings.master_admin_password),
                 "estado": "Activo",
                 "es_administrador": True,
             }
