@@ -4,11 +4,16 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
+from app.api.dependencies import get_current_user
 from app.repositories.oferta import OfertaRepository
 from app.schemas.oferta import OfertaCreate, OfertaResponse, OfertaUpdate
 from app.services.oferta import OfertaService
 
-router = APIRouter(prefix="/ofertas", tags=["ofertas"])
+router = APIRouter(
+    prefix="/ofertas",
+    tags=["ofertas"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 def get_service(db: Annotated[Session, Depends(get_db)]) -> OfertaService:

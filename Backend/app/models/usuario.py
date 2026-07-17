@@ -17,7 +17,8 @@ class Usuario(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     nombre: Mapped[str] = mapped_column(String(150), nullable=False)
     correo: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    rol: Mapped[str] = mapped_column(String(50), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    es_administrador: Mapped[bool] = mapped_column(default=False, nullable=False)
     estado: Mapped[str] = mapped_column(String(30), nullable=False)
 
     pedidos: Mapped[list[Pedido]] = relationship(back_populates="usuario")

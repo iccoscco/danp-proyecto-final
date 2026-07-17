@@ -4,11 +4,16 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
+from app.api.dependencies import get_current_user
 from app.repositories.categoria import CategoriaRepository
 from app.schemas.categoria import CategoriaCreate, CategoriaResponse, CategoriaUpdate
 from app.services.categoria import CategoriaService
 
-router = APIRouter(prefix="/categorias", tags=["categorias"])
+router = APIRouter(
+    prefix="/categorias",
+    tags=["categorias"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 def get_service(db: Annotated[Session, Depends(get_db)]) -> CategoriaService:

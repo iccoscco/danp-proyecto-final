@@ -4,11 +4,16 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
+from app.api.dependencies import get_current_user
 from app.repositories.producto import ProductoRepository
 from app.schemas.producto import ProductoCreate, ProductoResponse, ProductoUpdate
 from app.services.producto import ProductoService
 
-router = APIRouter(prefix="/productos", tags=["productos"])
+router = APIRouter(
+    prefix="/productos",
+    tags=["productos"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 def get_service(db: Annotated[Session, Depends(get_db)]) -> ProductoService:

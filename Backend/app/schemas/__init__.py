@@ -1,6 +1,7 @@
 """Pydantic schemas for API data contracts."""
 
 from app.schemas.categoria import CategoriaCreate, CategoriaResponse, CategoriaUpdate
+from app.schemas.auth import LoginRequest, TokenResponse
 from app.schemas.detalle_pedido import (
     DetallePedidoCreate,
     DetallePedidoResponse,
@@ -15,6 +16,7 @@ __all__ = [
     "CategoriaCreate",
     "CategoriaResponse",
     "CategoriaUpdate",
+    "LoginRequest",
     "DetallePedidoCreate",
     "DetallePedidoResponse",
     "DetallePedidoUpdate",
@@ -30,4 +32,5 @@ __all__ = [
     "UsuarioCreate",
     "UsuarioResponse",
     "UsuarioUpdate",
+    "TokenResponse",
 ]

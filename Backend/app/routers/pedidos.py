@@ -4,11 +4,16 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
+from app.api.dependencies import get_current_user
 from app.repositories.pedido import PedidoRepository
 from app.schemas.pedido import PedidoCreate, PedidoResponse, PedidoUpdate
 from app.services.pedido import PedidoService
 
-router = APIRouter(prefix="/pedidos", tags=["pedidos"])
+router = APIRouter(
+    prefix="/pedidos",
+    tags=["pedidos"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 def get_service(db: Annotated[Session, Depends(get_db)]) -> PedidoService:

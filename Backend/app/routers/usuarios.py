@@ -4,11 +4,16 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
+from app.api.dependencies import get_current_user
 from app.repositories.usuario import UsuarioRepository
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 from app.services.usuario import UsuarioService
 
-router = APIRouter(prefix="/usuarios", tags=["usuarios"])
+router = APIRouter(
+    prefix="/usuarios",
+    tags=["usuarios"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 def get_service(db: Annotated[Session, Depends(get_db)]) -> UsuarioService:
