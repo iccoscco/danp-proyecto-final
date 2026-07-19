@@ -1,5 +1,6 @@
 package com.example.app.interfaz.pantallas.splash
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
+import com.example.app.R
 import com.example.app.navegacion.Rutas
 import kotlinx.coroutines.delay
 
@@ -22,10 +25,12 @@ fun SplashScreen(
 
         delay(2000)
 
-        navController.navigate(Rutas.LOGIN) {
+        navController.navigate(Rutas.BIENVENIDA) {
+
             popUpTo(Rutas.SPLASH) {
                 inclusive = true
             }
+
         }
 
     }
@@ -36,9 +41,9 @@ fun SplashScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(
-            text = "🌱",
-            style = MaterialTheme.typography.displayLarge
+        Image(
+            painter = painterResource(R.drawable.logo),
+            contentDescription = "Logo SaveBite"
         )
 
         Text(
@@ -47,7 +52,7 @@ fun SplashScreen(
         )
 
         Text(
-            text = "Reduce el desperdicio de alimentos"
+            text = "Rescatando alimentos..."
         )
 
     }
