@@ -2,13 +2,10 @@ package com.example.app.interfaz.pantallas.productos
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -18,15 +15,9 @@ import com.example.app.interfaz.componentes.TarjetaProducto
 @Composable
 fun ProductosScreen() {
 
-    var busqueda by remember {
-        mutableStateOf("")
-    }
+    var busqueda by remember { mutableStateOf("") }
 
-    var categoriaSeleccionada by remember {
-        mutableStateOf("Todos")
-    }
-
-    val productos = RepositorioProductosFalso.obtenerProductos()
+    var categoriaSeleccionada by remember { mutableStateOf("Todos") }
 
     val categorias = listOf(
         "Todos",
@@ -36,16 +27,12 @@ fun ProductosScreen() {
         "Comidas"
     )
 
-    val productosFiltrados = productos.filter { producto ->
+    val productos = RepositorioProductosFalso.obtenerProductos()
 
-        val coincideBusqueda =
-            producto.nombre.contains(busqueda, ignoreCase = true)
+    val productosFiltrados = productos.filter {
 
-        val coincideCategoria =
-            categoriaSeleccionada == "Todos" ||
-                    producto.categoria == categoriaSeleccionada
-
-        coincideBusqueda && coincideCategoria
+        (categoriaSeleccionada == "Todos" || it.categoria == categoriaSeleccionada) &&
+                it.nombre.contains(busqueda, true)
 
     }
 
@@ -56,11 +43,11 @@ fun ProductosScreen() {
     ) {
 
         Text(
-            text = "🛍 Productos",
+            "🛍 Productos",
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = busqueda,
@@ -68,42 +55,55 @@ fun ProductosScreen() {
                 busqueda = it
             },
             label = {
-                Text("Buscar producto")
+                Text("Buscar productos")
             },
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Row(
-            modifier = Modifier.horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.horizontalScroll(rememberScrollState())
         ) {
 
             categorias.forEach { categoria ->
 
-                AssistChip(
+                FilterChip(
+
+                    selected = categoria == categoriaSeleccionada,
+
                     onClick = {
                         categoriaSeleccionada = categoria
                     },
+
                     label = {
                         Text(categoria)
                     }
+
                 )
+
+                Spacer(modifier = Modifier.width(8.dp))
 
             }
 
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            "⭐ Recomendados",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            items(productosFiltrados) { producto ->
+            items(productosFiltrados) {
 
-                TarjetaProducto(producto)
+                TarjetaProducto(it)
 
             }
 

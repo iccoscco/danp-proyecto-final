@@ -1,21 +1,25 @@
 package com.example.app.interfaz.componentes
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.example.app.datos.RepositorioCarritoFalso
 import com.example.app.modelos.Producto
 
 @Composable
 fun TarjetaProducto(producto: Producto) {
+
+    val context = LocalContext.current
 
     Card(
         modifier = Modifier
@@ -44,7 +48,7 @@ fun TarjetaProducto(producto: Producto) {
             ) {
 
                 Text(
-                    producto.nombre,
+                    text = producto.nombre,
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -60,12 +64,12 @@ fun TarjetaProducto(producto: Producto) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    "S/. ${producto.precioOriginal}",
+                    text = "S/. ${producto.precioOriginal}",
                     textDecoration = TextDecoration.LineThrough
                 )
 
                 Text(
-                    "S/. ${producto.precioOferta}",
+                    text = "S/. ${producto.precioOferta}",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -73,7 +77,17 @@ fun TarjetaProducto(producto: Producto) {
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Button(
-                    onClick = { }
+                    onClick = {
+
+                        RepositorioCarritoFalso.agregar(producto)
+
+                        Toast.makeText(
+                            context,
+                            "${producto.nombre} agregado al carrito",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                    }
                 ) {
                     Text("Agregar")
                 }
