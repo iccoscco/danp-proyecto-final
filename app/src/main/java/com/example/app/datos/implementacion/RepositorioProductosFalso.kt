@@ -8,48 +8,53 @@ object RepositorioProductosFalso {
     fun obtenerProductos() = listOf(
 
         Producto(
-            1,
-            "Pan Integral",
-            8.50,
-            5.50,
-            "35% OFF",
-            R.drawable.pan
+            id = 1,
+            nombre = "Pan Integral",
+            categoria = "Panadería",
+            precioOriginal = 8.50,
+            precioOferta = 5.50,
+            descuento = "35% OFF",
+            imagen = R.drawable.pan
         ),
 
         Producto(
-            2,
-            "Ensalada César",
-            15.00,
-            8.50,
-            "Último día",
-            R.drawable.ensalada
+            id = 2,
+            nombre = "Ensalada César",
+            categoria = "Comidas",
+            precioOriginal = 15.00,
+            precioOferta = 8.50,
+            descuento = "Último día",
+            imagen = R.drawable.ensalada
         ),
 
         Producto(
-            3,
-            "Café Americano",
-            10.00,
-            6.00,
-            "40% OFF",
-            R.drawable.cafe
+            id = 3,
+            nombre = "Café Americano",
+            categoria = "Bebidas",
+            precioOriginal = 10.00,
+            precioOferta = 6.00,
+            descuento = "40% OFF",
+            imagen = R.drawable.cafe
         ),
 
         Producto(
-            4,
-            "Pizza Familiar",
-            35.00,
-            20.00,
-            "43% OFF",
-            R.drawable.pizza
+            id = 4,
+            nombre = "Pizza Familiar",
+            categoria = "Comidas",
+            precioOriginal = 35.00,
+            precioOferta = 20.00,
+            descuento = "43% OFF",
+            imagen = R.drawable.pizza
         ),
 
         Producto(
-            5,
-            "Manzanas",
-            9.00,
-            5.00,
-            "Próximo a vencer",
-            R.drawable.manzana
+            id = 5,
+            nombre = "Manzanas",
+            categoria = "Frutas",
+            precioOriginal = 9.00,
+            precioOferta = 5.00,
+            descuento = "Próximo a vencer",
+            imagen = R.drawable.manzana
         )
 
     )
