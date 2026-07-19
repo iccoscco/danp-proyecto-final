@@ -1,8 +1,13 @@
 package com.example.app.interfaz.pantallas.inicioSesion
 
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,13 +24,17 @@ fun InicioSesionScreen(
 
     val context = LocalContext.current
 
-    var correo by remember {
-        mutableStateOf("")
-    }
+    var correo by remember { mutableStateOf("") }
+    var contrasena by remember { mutableStateOf("") }
 
-    var contrasena by remember {
-        mutableStateOf("")
-    }
+    val correoValido = Patterns.EMAIL_ADDRESS.matcher(correo).matches()
+
+    val contrasenaValida =
+        contrasena.length >= 8 &&
+                contrasena.any { it.isLetter() } &&
+                contrasena.any { it.isDigit() }
+
+    val formularioValido = correoValido && contrasenaValida
 
     Column(
         modifier = Modifier
@@ -57,8 +66,18 @@ fun InicioSesionScreen(
                 Text("Correo electrónico")
             },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            isError = correo.isNotEmpty() && !correoValido
         )
+
+        if (correo.isNotEmpty() && !correoValido) {
+
+            Text(
+                text = "Ingrese un correo válido",
+                color = MaterialTheme.colorScheme.error
+            )
+
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -72,25 +91,25 @@ fun InicioSesionScreen(
             },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            isError = contrasena.isNotEmpty() && !contrasenaValida
         )
+
+        if (contrasena.isNotEmpty() && !contrasenaValida) {
+
+            Text(
+                text = "Debe tener mínimo 8 caracteres, letras y números.",
+                color = MaterialTheme.colorScheme.error
+            )
+
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
+            enabled = formularioValido,
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-
-                if (correo.isBlank() || contrasena.isBlank()) {
-
-                    Toast.makeText(
-                        context,
-                        "Complete todos los campos",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    return@Button
-                }
 
                 val acceso = RepositorioAutenticacionFalso.iniciarSesion(
                     correo,
@@ -118,7 +137,6 @@ fun InicioSesionScreen(
                 }
 
             }
-
         ) {
 
             Text("Ingresar")

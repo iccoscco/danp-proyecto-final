@@ -9,13 +9,13 @@ object RepositorioAutenticacionFalso {
         Usuario(
             nombre = "Administrador",
             correo = "admin@savebite.com",
-            contrasena = "123456"
+            contrasena = "Admin1234"
         ),
 
         Usuario(
             nombre = "Cliente",
             correo = "cliente@savebite.com",
-            contrasena = "123456"
+            contrasena = "Save1234"
         )
 
     )
@@ -27,8 +27,8 @@ object RepositorioAutenticacionFalso {
 
         return usuarios.any {
 
-            it.correo == correo &&
-                    it.contrasena == contrasena
+            it.correo.equals(correo.trim(), ignoreCase = true) &&
+                    it.contrasena == contrasena.trim()
 
         }
 
@@ -36,8 +36,14 @@ object RepositorioAutenticacionFalso {
 
     fun registrar(usuario: Usuario): Boolean {
 
-        if (usuarios.any { it.correo == usuario.correo }) {
+        if (usuarios.any {
+
+                it.correo.equals(usuario.correo, ignoreCase = true)
+
+            }) {
+
             return false
+
         }
 
         usuarios.add(usuario)
