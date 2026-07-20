@@ -55,7 +55,7 @@ fun TarjetaProducto(producto: Producto) {
                 Spacer(modifier = Modifier.height(6.dp))
 
                 AssistChip(
-                    onClick = {},
+                    onClick = { },
                     label = {
                         Text(producto.descuento)
                     }
@@ -74,9 +74,10 @@ fun TarjetaProducto(producto: Producto) {
                     color = MaterialTheme.colorScheme.primary
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
+                    modifier = Modifier.fillMaxWidth(),
                     onClick = {
 
                         RepositorioCarritoFalso.agregar(producto)
@@ -89,7 +90,9 @@ fun TarjetaProducto(producto: Producto) {
 
                     }
                 ) {
-                    Text("Agregar")
+
+                    Text("🛒 Agregar al carrito")
+
                 }
 
             }

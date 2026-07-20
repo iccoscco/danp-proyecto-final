@@ -7,10 +7,23 @@ object RepositorioCarritoFalso {
     private val carrito = mutableListOf<Producto>()
 
     fun agregar(producto: Producto) {
-        carrito.add(producto)
+
+        val existente = carrito.find { it.id == producto.id }
+
+        if (existente != null) {
+
+            existente.cantidad++
+
+        } else {
+
+            producto.cantidad = 1
+            carrito.add(producto)
+
+        }
+
     }
 
-    fun obtenerProductos(): List<Producto> {
+    fun obtenerProductos(): MutableList<Producto> {
         return carrito
     }
 
@@ -19,7 +32,13 @@ object RepositorioCarritoFalso {
     }
 
     fun total(): Double {
-        return carrito.sumOf { it.precioOferta }
+
+        return carrito.sumOf {
+
+            it.precioOferta * it.cantidad
+
+        }
+
     }
 
     fun vaciar() {

@@ -25,7 +25,10 @@ fun ProductosScreen() {
         "Panadería",
         "Bebidas",
         "Frutas",
-        "Comidas"
+        "Comidas",
+        "Lácteos",
+        "Postres",
+        "Snacks"
     )
 
     val productos = RepositorioProductosFalso.obtenerProductos()

@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -39,7 +40,8 @@ fun CarritoScreen() {
         if (carrito.isEmpty()) {
 
             Text(
-                text = "No hay productos en el carrito."
+                text = "Tu carrito está vacío.",
+                style = MaterialTheme.typography.bodyLarge
             )
 
         } else {
@@ -51,7 +53,10 @@ fun CarritoScreen() {
 
                 items(carrito) { producto ->
 
-                    Card {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
 
                         Column(
                             modifier = Modifier.padding(16.dp)
@@ -59,14 +64,64 @@ fun CarritoScreen() {
 
                             Text(
                                 text = producto.nombre,
-                                style = MaterialTheme.typography.titleMedium
+                                style = MaterialTheme.typography.titleLarge
                             )
+
+                            Spacer(modifier = Modifier.height(6.dp))
 
                             Text(
                                 text = "Precio: S/. ${producto.precioOferta}"
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+
+                                Button(
+                                    onClick = {
+
+                                        if (producto.cantidad > 1) {
+                                            producto.cantidad--
+                                        }
+
+                                    }
+                                ) {
+                                    Text("-")
+                                }
+
+                                Spacer(modifier = Modifier.width(16.dp))
+
+                                Text(
+                                    text = producto.cantidad.toString(),
+                                    style = MaterialTheme.typography.titleLarge
+                                )
+
+                                Spacer(modifier = Modifier.width(16.dp))
+
+                                Button(
+                                    onClick = {
+
+                                        producto.cantidad++
+
+                                    }
+                                ) {
+                                    Text("+")
+                                }
+
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text(
+                                text = "Subtotal: S/. ${
+                                    producto.precioOferta * producto.cantidad
+                                }",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
 
                             OutlinedButton(
                                 onClick = {
@@ -78,7 +133,7 @@ fun CarritoScreen() {
                                 }
                             ) {
 
-                                Text("Eliminar")
+                                Text("🗑 Eliminar")
 
                             }
 
@@ -90,16 +145,25 @@ fun CarritoScreen() {
 
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Divider()
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "Productos: ${carrito.sumOf { it.cantidad }}",
+                style = MaterialTheme.typography.titleMedium
+            )
 
             Text(
                 text = "TOTAL: S/. ${
-                    carrito.sumOf { it.precioOferta }
+                    carrito.sumOf {
+                        it.precioOferta * it.cantidad
+                    }
                 }",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.headlineSmall
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
@@ -111,14 +175,14 @@ fun CarritoScreen() {
 
                     Toast.makeText(
                         context,
-                        "¡Pedido realizado con éxito!",
+                        "¡Pedido realizado correctamente!",
                         Toast.LENGTH_LONG
                     ).show()
 
                 }
             ) {
 
-                Text("Finalizar pedido")
+                Text("🛍 Finalizar compra")
 
             }
 

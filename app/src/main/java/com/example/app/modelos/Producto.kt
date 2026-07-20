@@ -1,5 +1,9 @@
 package com.example.app.modelos
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
+
 data class Producto(
 
     val id: Int,
@@ -16,4 +20,8 @@ data class Producto(
 
     val imagen: Int
 
-)
+) {
+
+    var cantidad by mutableIntStateOf(1)
+
+}
