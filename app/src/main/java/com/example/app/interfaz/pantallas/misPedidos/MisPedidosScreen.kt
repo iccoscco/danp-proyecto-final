@@ -18,30 +18,28 @@ fun MisPedidosScreen() {
     )
 
     Column(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
 
         Text(
-            "📦 Mis Pedidos",
-            style = MaterialTheme.typography.headlineLarge
+            text = "📦 Mis Pedidos",
+            style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        LazyColumn {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
 
-            items(pedidos) {
+            items(pedidos) { pedido ->
 
-                Card(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp)
-                ) {
+                Card {
 
                     Text(
-                        text = it,
+                        text = pedido,
                         modifier = Modifier.padding(16.dp)
                     )
 

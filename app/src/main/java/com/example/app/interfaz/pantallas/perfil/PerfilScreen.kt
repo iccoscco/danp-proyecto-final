@@ -10,25 +10,54 @@ import androidx.compose.ui.unit.dp
 fun PerfilScreen() {
 
     Column(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(20.dp)
     ) {
 
         Text(
-            "👤 Mi Perfil",
-            style = MaterialTheme.typography.headlineLarge
+            text = "👤 Mi Perfil",
+            style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        Text("Nombre: Cliente")
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
 
-        Text("Correo: cliente@savebite.com")
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
 
-        Text("Miembro desde: 2026")
+                Text(
+                    text = "Nombre",
+                    style = MaterialTheme.typography.titleMedium
+                )
 
-        Text("Pedidos realizados: 5")
+                Text("Cliente SaveBite")
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Correo",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text("cliente@savebite.com")
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Miembro desde",
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text("2026")
+
+            }
+
+        }
 
     }
 
