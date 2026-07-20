@@ -3,6 +3,7 @@ package com.example.app.interfaz.pantallas.productos
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
@@ -31,8 +32,15 @@ fun ProductosScreen() {
 
     val productosFiltrados = productos.filter {
 
-        (categoriaSeleccionada == "Todos" || it.categoria == categoriaSeleccionada) &&
-                it.nombre.contains(busqueda, true)
+        (categoriaSeleccionada == "Todos" ||
+                it.categoria == categoriaSeleccionada)
+
+                &&
+
+                it.nombre.contains(
+                    busqueda,
+                    ignoreCase = true
+                )
 
     }
 
@@ -43,7 +51,7 @@ fun ProductosScreen() {
     ) {
 
         Text(
-            "🛍 Productos",
+            text = "🛍 Productos",
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -63,7 +71,9 @@ fun ProductosScreen() {
         Spacer(modifier = Modifier.height(20.dp))
 
         Row(
-            modifier = Modifier.horizontalScroll(rememberScrollState())
+            modifier = Modifier.horizontalScroll(
+                rememberScrollState()
+            )
         ) {
 
             categorias.forEach { categoria ->
@@ -73,11 +83,15 @@ fun ProductosScreen() {
                     selected = categoria == categoriaSeleccionada,
 
                     onClick = {
+
                         categoriaSeleccionada = categoria
+
                     },
 
                     label = {
+
                         Text(categoria)
+
                     }
 
                 )
@@ -88,10 +102,52 @@ fun ProductosScreen() {
 
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            "⭐ Recomendados",
+            text = "⭐ Recomendados",
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+
+            items(productos.take(3)) { producto ->
+
+                Card(
+                    modifier = Modifier.width(180.dp)
+                ) {
+
+                    Column(
+                        modifier = Modifier.padding(12.dp)
+                    ) {
+
+                        Text(
+                            text = producto.nombre,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Text(
+                            text = "S/. ${producto.precioOferta}"
+                        )
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "Todos los productos",
             style = MaterialTheme.typography.titleLarge
         )
 
@@ -101,9 +157,9 @@ fun ProductosScreen() {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
-            items(productosFiltrados) {
+            items(productosFiltrados) { producto ->
 
-                TarjetaProducto(it)
+                TarjetaProducto(producto)
 
             }
 

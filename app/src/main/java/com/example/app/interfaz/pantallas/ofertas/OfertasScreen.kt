@@ -1,6 +1,9 @@
 package com.example.app.interfaz.pantallas.ofertas
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -14,7 +17,15 @@ import com.example.app.interfaz.componentes.TarjetaProducto
 @Composable
 fun OfertasScreen() {
 
-    val ofertas = RepositorioProductosFalso.obtenerProductos()
+    val ofertas = RepositorioProductosFalso
+        .obtenerProductos()
+        .filter {
+
+            it.descuento.contains("OFF") ||
+                    it.descuento.contains("Último") ||
+                    it.descuento.contains("Próximo")
+
+        }
 
     Column(
         modifier = Modifier
@@ -27,21 +38,19 @@ fun OfertasScreen() {
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         Text(
-            text = "Productos con descuento y próximos a vencer.",
+            text = "Aprovecha los alimentos con descuento antes de que se agoten.",
             style = MaterialTheme.typography.bodyMedium
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
             items(ofertas) { producto ->
+
                 TarjetaProducto(producto)
+
             }
 
         }

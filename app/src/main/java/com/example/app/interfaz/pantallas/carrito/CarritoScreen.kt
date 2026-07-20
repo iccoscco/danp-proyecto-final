@@ -4,15 +4,8 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -30,8 +23,6 @@ fun CarritoScreen() {
         }
     }
 
-    val total = carrito.sumOf { it.precioOferta }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -47,33 +38,33 @@ fun CarritoScreen() {
 
         if (carrito.isEmpty()) {
 
-            Text("Tu carrito está vacío.")
+            Text(
+                text = "No hay productos en el carrito."
+            )
 
         } else {
 
             LazyColumn(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
                 items(carrito) { producto ->
 
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        elevation = CardDefaults.cardElevation(4.dp)
-                    ) {
+                    Card {
 
                         Column(
                             modifier = Modifier.padding(16.dp)
                         ) {
 
                             Text(
-                                producto.nombre,
+                                text = producto.nombre,
                                 style = MaterialTheme.typography.titleMedium
                             )
 
-                            Text("S/. ${producto.precioOferta}")
+                            Text(
+                                text = "Precio: S/. ${producto.precioOferta}"
+                            )
 
                             Spacer(modifier = Modifier.height(8.dp))
 
@@ -81,6 +72,7 @@ fun CarritoScreen() {
                                 onClick = {
 
                                     RepositorioCarritoFalso.eliminar(producto)
+
                                     carrito.remove(producto)
 
                                 }
@@ -98,10 +90,12 @@ fun CarritoScreen() {
 
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "TOTAL: S/. $total",
+                text = "TOTAL: S/. ${
+                    carrito.sumOf { it.precioOferta }
+                }",
                 style = MaterialTheme.typography.titleLarge
             )
 
@@ -117,7 +111,7 @@ fun CarritoScreen() {
 
                     Toast.makeText(
                         context,
-                        "Pedido realizado correctamente",
+                        "¡Pedido realizado con éxito!",
                         Toast.LENGTH_LONG
                     ).show()
 
