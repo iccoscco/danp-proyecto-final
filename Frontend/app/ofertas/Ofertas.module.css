@@ -210,6 +210,28 @@
   box-shadow: 0 0 0 3px rgb(23 105 224 / 12%);
 }
 
+.inputArchivo {
+  cursor: pointer;
+}
+
+.inputArchivo::file-selector-button {
+  padding: 4px 12px;
+  margin-right: 12px;
+  border: 1px solid #b9d3f8;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: var(--color-azul);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.inputArchivo::file-selector-button:hover {
+  background: #eff6ff;
+  border-color: var(--color-azul);
+}
+
 .subtituloForm {
   margin: 8px 0 0;
   padding-bottom: 6px;

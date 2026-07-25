@@ -6,7 +6,7 @@ from supabase import Client
 # muestre el precio original y calcule el precio en oferta.
 SELECT_OFERTA = (
     "id,nombre,descuento,fecha_inicio,fecha_fin,estado,producto_id,imagen_url,"
-    "productos(id,nombre,precio,stock,imagen_url)"
+    "productos(id,nombre,precio,stock,imagen_url,fecha_vencimiento)"
 )
 
 
@@ -69,6 +69,7 @@ class SupabaseOfertaRepository:
         oferta["nombre_producto"] = producto.get("nombre")
         oferta["precio_original"] = producto.get("precio")
         oferta["stock_producto"] = producto.get("stock")
+        oferta["fecha_vencimiento"] = producto.get("fecha_vencimiento")
         # imagen_url de la oferta puede estar vacía; si lo está, hereda la del producto.
         if not oferta.get("imagen_url"):
             oferta["imagen_url"] = producto.get("imagen_url")

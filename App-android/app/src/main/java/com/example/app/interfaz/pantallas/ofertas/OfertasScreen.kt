@@ -14,8 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.app.datos.SesionManager
 import com.example.app.datos.red.RetrofitClient
-import com.example.app.interfaz.componentes.TarjetaProducto
-import com.example.app.modelos.Producto
+import com.example.app.interfaz.componentes.TarjetaOferta
+import com.example.app.modelos.Oferta
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -25,7 +25,7 @@ fun OfertasScreen() {
     val scope = rememberCoroutineScope()
     val sesionManager = remember { SesionManager(context) }
 
-    var ofertas by remember { mutableStateOf<List<Producto>>(emptyList()) }
+    var ofertas by remember { mutableStateOf<List<Oferta>>(emptyList()) }
     var cargando by remember { mutableStateOf(false) }
 
     fun cargarOfertas() {
@@ -39,11 +39,8 @@ fun OfertasScreen() {
                     return@launch
                 }
 
-                val response = RetrofitClient.productoApi.obtenerProductos("Bearer $token")
+                val response = RetrofitClient.ofertaApi.obtenerOfertas("Bearer $token")
                 if (response.isSuccessful) {
-                    // Por ahora mostramos todos como "ofertas" o podemos filtrar por stock bajo
-                    // o productos que vencen pronto si tuviéramos esa lógica en el modelo real.
-                    // En el modelo real no tenemos campo 'descuento' como en el falso.
                     ofertas = response.body() ?: emptyList()
                 } else {
                     Toast.makeText(context, "Error al cargar ofertas", Toast.LENGTH_SHORT).show()
@@ -89,10 +86,11 @@ fun OfertasScreen() {
                 }
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
-                    items(ofertas) { producto ->
-                        TarjetaProducto(producto)
+                    items(ofertas) { oferta ->
+                        TarjetaOferta(oferta)
                     }
                 }
             }

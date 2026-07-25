@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.app.datos.RepositorioCarritoFalso
+import com.example.app.datos.repositorios.RepositorioCarrito
 import com.example.app.modelos.Producto
 
 @Composable
@@ -76,16 +76,17 @@ fun TarjetaProducto(producto: Producto) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     onClick = {
-                        RepositorioCarritoFalso.agregar(producto)
+                        RepositorioCarrito.agregar(producto)
                         Toast.makeText(
                             context,
-                            "${producto.nombre} agregado al carrito",
+                            "🛒 ${producto.nombre} agregado al carrito",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 ) {
-                    Text("🛒 Agregar")
+                    Text("Agregar al carrito", fontWeight = FontWeight.Bold)
                 }
             }
         }

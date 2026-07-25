@@ -73,6 +73,16 @@ export default function OfertasPage() {
   const [descuentoNuevo, setDescuentoNuevo] = useState<string>("");
   const [precioNuevo, setPrecioNuevo] = useState<string>("");
 
+  const categorias = [
+    "Panadería",
+    "Bebidas",
+    "Frutas",
+    "Comidas",
+    "Lácteos",
+    "Postres",
+    "Snacks"
+  ];
+
   async function cargarOfertas() {
     setCargando(true);
     setError("");
@@ -337,13 +347,20 @@ export default function OfertasPage() {
             <form className={styles.formulario} onSubmit={guardarNueva}>
               <p className={styles.subtituloForm}>Producto</p>
               <label>Nombre<input name="nombre_producto" required /></label>
-              <label>Categoría<input name="categoria" required /></label>
+              <label>Categoría
+                <select defaultValue="" name="categoria" required>
+                  <option value="" disabled>Selecciona una categoría</option>
+                  {categorias.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </label>
               <label>Precio
                 <input min="0" name="precio" onChange={(e) => setPrecioNuevo(e.target.value)} required step="0.01" type="number" />
               </label>
               <label>Stock<input min="0" name="stock" required type="number" /></label>
               <label>Fecha de vencimiento<input name="fecha_vencimiento" required type="date" /></label>
-              <label>Imagen del producto<input accept="image/*" name="imagen" type="file" /></label>
+              <label>Imagen del producto<input accept="image/*" className={styles.inputArchivo} name="imagen" type="file" /></label>
 
               <p className={styles.subtituloForm}>Oferta</p>
               <label>Nombre de la oferta<input name="nombre_oferta" required /></label>

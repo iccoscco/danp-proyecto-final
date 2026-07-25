@@ -1,14 +1,91 @@
+"use client";
+
+import { FormEvent, useEffect, useState } from "react";
 import LayoutDashboard from "../../componentes/LayoutDashboard";
+import { solicitar } from "../../utilidades/api";
 import styles from "./Pedidos.module.css";
 
-const pedidos = [
-  { id: "Pedido 014", cliente: "Valeria Soto", fecha: "12 Jul 2026", total: "S/ 74.00", estado: "Pendiente", claseEstado: "estadoPendiente" },
-  { id: "Pedido 015", cliente: "Miguel Castro", fecha: "12 Jul 2026", total: "S/ 130.50", estado: "Completado", claseEstado: "estadoCompletado" },
-  { id: "Pedido 016", cliente: "Sofía Paredes", fecha: "11 Jul 2026", total: "S/ 46.90", estado: "Cancelado", claseEstado: "estadoCancelado" },
-  { id: "Pedido 017", cliente: "Jorge Núñez", fecha: "11 Jul 2026", total: "S/ 95.00", estado: "Completado", claseEstado: "estadoCompletado" },
-];
+type Pedido = {
+  id: number;
+  numero_pedido: string;
+  cliente_id: number;
+  cliente_nombre: string;
+  fecha: string;
+  total: number;
+  estado: string;
+};
 
 export default function PedidosPage() {
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
+  const [mensaje, setMensaje] = useState("");
+  const [pedidoEnEdicion, setPedidoEnEdicion] = useState<Pedido | null>(null);
+  const [guardando, setGuardando] = useState(false);
+
+  async function cargarPedidos() {
+    setCargando(true);
+    setError("");
+    try {
+      const respuesta = await solicitar("/pedidos/");
+      setPedidos(await respuesta.json());
+    } catch (causa) {
+      setError("No se pudieron cargar los pedidos.");
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  useEffect(() => {
+    void cargarPedidos();
+  }, []);
+
+  async function eliminarPedido(id: number) {
+    if (!window.confirm("¿Eliminar este pedido permanentemente?")) return;
+    try {
+      await solicitar(`/pedidos/${id}`, { method: "DELETE" });
+      setMensaje("Pedido eliminado.");
+      await cargarPedidos();
+    } catch {
+      setError("No se pudo eliminar el pedido.");
+    }
+  }
+
+  async function guardarEdicion(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    if (!pedidoEnEdicion) return;
+    setGuardando(true);
+    try {
+      const form = new FormData(evento.currentTarget);
+      const datos = {
+        estado: form.get("estado"),
+        total: Number(form.get("total")),
+      };
+      await solicitar(`/pedidos/${pedidoEnEdicion.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+      setPedidoEnEdicion(null);
+      setMensaje("Pedido actualizado correctamente.");
+      await cargarPedidos();
+    } catch {
+      setError("Error al actualizar el pedido.");
+    } finally {
+      setGuardando(false);
+    }
+  }
+
+  function obtenerClaseEstado(estado: string) {
+    switch (estado) {
+      case "Pendiente": return styles.estadoPendiente;
+      case "Pagado": return styles.estadoPagado;
+      case "Completado": return styles.estadoCompletado;
+      case "Cancelado": return styles.estadoCancelado;
+      default: return "";
+    }
+  }
+
   return (
     <LayoutDashboard enlaceActivo="/pedidos">
       <section className={styles.encabezado}>
@@ -16,11 +93,12 @@ export default function PedidosPage() {
           <p className={styles.etiqueta}>Operaciones</p>
           <h1>Pedidos</h1>
         </div>
-        <button className={styles.botonPrimario} type="button">Agregar pedido</button>
       </section>
 
       <section className={styles.panel} aria-label="Listado de pedidos">
-        <input aria-label="Buscar pedidos" className={styles.buscador} placeholder="Buscar pedidos" type="search" />
+        {mensaje && <p className={styles.mensajeExito}>{mensaje}</p>}
+        {error && <p className={styles.mensajeError}>{error}</p>}
+
         <div className={styles.contenedorTabla}>
           <table className={styles.tabla}>
             <thead>
@@ -34,25 +112,61 @@ export default function PedidosPage() {
               </tr>
             </thead>
             <tbody>
-              {pedidos.map((pedido) => (
-                <tr key={pedido.id}>
-                  <td>{pedido.id}</td>
-                  <td>{pedido.cliente}</td>
-                  <td>{pedido.fecha}</td>
-                  <td>{pedido.total}</td>
-                  <td><span className={`${styles.estado} ${styles[pedido.claseEstado]}`}>{pedido.estado}</span></td>
-                  <td>
-                    <div className={styles.acciones}>
-                      <button className={styles.botonSecundario} type="button">Editar</button>
-                      <button className={styles.botonEliminar} type="button">Eliminar</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {cargando ? (
+                <tr><td colSpan={6} className={styles.estadoTabla}>Cargando...</td></tr>
+              ) : pedidos.length === 0 ? (
+                <tr><td colSpan={6} className={styles.estadoTabla}>No hay pedidos registrados.</td></tr>
+              ) : (
+                pedidos.map((pedido) => (
+                  <tr key={pedido.id}>
+                    <td><strong>{pedido.numero_pedido}</strong></td>
+                    <td>{pedido.cliente_nombre}</td>
+                    <td>{new Date(pedido.fecha).toLocaleString()}</td>
+                    <td>S/ {Number(pedido.total).toFixed(2)}</td>
+                    <td><span className={`${styles.estado} ${obtenerClaseEstado(pedido.estado)}`}>{pedido.estado}</span></td>
+                    <td>
+                      <div className={styles.acciones}>
+                        <button className={styles.botonSecundario} onClick={() => setPedidoEnEdicion(pedido)} type="button">Editar</button>
+                        <button className={styles.botonEliminar} onClick={() => void eliminarPedido(pedido.id)} type="button">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </section>
+
+      {pedidoEnEdicion && (
+        <div className={styles.fondoModal}>
+          <section className={styles.modal}>
+            <div className={styles.cabeceraModal}>
+              <h2>Editar {pedidoEnEdicion.numero_pedido}</h2>
+              <button className={styles.cerrarModal} onClick={() => setPedidoEnEdicion(null)}>×</button>
+            </div>
+            <form className={styles.formulario} onSubmit={guardarEdicion}>
+              <label>Cliente
+                <input disabled value={pedidoEnEdicion.cliente_nombre} />
+              </label>
+              <label>Total (S/)
+                <input defaultValue={pedidoEnEdicion.total} name="total" required step="0.01" type="number" />
+              </label>
+              <label>Estado
+                <select defaultValue={pedidoEnEdicion.estado} name="estado">
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Pagado">Pagado (En preparación)</option>
+                  <option value="Completado">Completado (Entregado)</option>
+                  <option value="Cancelado">Cancelado</option>
+                </select>
+              </label>
+              <button className={styles.botonPrimario} disabled={guardando} type="submit">
+                {guardando ? "Guardando..." : "Guardar cambios"}
+              </button>
+            </form>
+          </section>
+        </div>
+      )}
     </LayoutDashboard>
   );
 }

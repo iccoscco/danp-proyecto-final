@@ -34,4 +34,22 @@ object RetrofitClient {
             .build()
             .create(ProductoApi::class.java)
     }
+
+    val ofertaApi: OfertaApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(httpClient)
+            .build()
+            .create(OfertaApi::class.java)
+    }
+
+    val pedidoApi: PedidoApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(httpClient)
+            .build()
+            .create(PedidoApi::class.java)
+    }
 }

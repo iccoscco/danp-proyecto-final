@@ -42,6 +42,7 @@ def _to_response(oferta: dict[str, object]) -> OfertaResponse:
         nombre_producto=oferta.get("nombre_producto"),
         precio_original=oferta.get("precio_original"),
         stock_producto=oferta.get("stock_producto"),
+        fecha_vencimiento=oferta.get("fecha_vencimiento"),
     )
 
 

@@ -36,3 +36,4 @@ class OfertaResponse(BaseModel):
     nombre_producto: str | None = None
     precio_original: Decimal | None = None
     stock_producto: int | None = None
+    fecha_vencimiento: date | None = None
