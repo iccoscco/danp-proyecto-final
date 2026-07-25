@@ -1,4 +1,8 @@
+"use client";
+
 import LayoutDashboard from "../../componentes/LayoutDashboard";
+import GraficaBarras from "../../componentes/GraficaBarras";
+import GraficaEstados from "../../componentes/GraficaEstados";
 import styles from "./Dashboard.module.css";
 
 const resumen = [
@@ -15,9 +19,26 @@ const ultimosPedidos = [
   { id: "Pedido 004", cliente: "Diego Flores", total: "S/ 210.00", estado: "En proceso" },
 ];
 
+// Datos mock — reemplazar por fetch al backend cuando se conecte.
+const ventasSemana = [
+  { etiqueta: "Lun", valor: 32 },
+  { etiqueta: "Mar", valor: 45 },
+  { etiqueta: "Mié", valor: 28 },
+  { etiqueta: "Jue", valor: 56 },
+  { etiqueta: "Vie", valor: 61 },
+  { etiqueta: "Sáb", valor: 38 },
+  { etiqueta: "Dom", valor: 19 },
+];
+
+const pedidosEstado = [
+  { etiqueta: "Pendiente", valor: 24, color: "#f59e0b" },
+  { etiqueta: "En proceso", valor: 12, color: "#1769e0" },
+  { etiqueta: "Completado", valor: 86, color: "#16a34a" },
+];
+
 export default function DashboardPage() {
   return (
-    <LayoutDashboard>
+    <LayoutDashboard enlaceActivo="/dashboard">
       <section className={styles.encabezado}>
         <div>
           <p className={styles.etiqueta}>Vista general</p>
@@ -25,6 +46,13 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {/* Gráficas */}
+      <section className={styles.graficas} aria-label="Resumen gráfico">
+        <GraficaBarras titulo="Ventas de la semana" datos={ventasSemana} color="#1769e0" />
+        <GraficaEstados titulo="Pedidos por estado" datos={pedidosEstado} />
+      </section>
+
+      {/* Tarjetas */}
       <section className={styles.tarjetas} aria-label="Resumen general">
         {resumen.map((item) => (
           <article className={styles.tarjeta} key={item.etiqueta}>
@@ -34,6 +62,7 @@ export default function DashboardPage() {
         ))}
       </section>
 
+      {/* Últimos pedidos */}
       <section className={styles.pedidos} aria-labelledby="ultimos-pedidos">
         <h2 id="ultimos-pedidos">Últimos pedidos</h2>
         <div className={styles.contenedorTabla}>

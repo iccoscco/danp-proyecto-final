@@ -20,6 +20,13 @@
   letter-spacing: -0.03em;
 }
 
+.graficas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
 .tarjetas {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -108,6 +115,10 @@
 }
 
 @media (max-width: 760px) {
+  .graficas {
+    grid-template-columns: 1fr;
+  }
+
   .tarjetas {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

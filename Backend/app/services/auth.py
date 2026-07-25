@@ -13,4 +13,5 @@ class AuthService:
         return usuario
 
     def create_token(self, usuario: dict[str, object]) -> str:
-        return create_access_token(str(usuario["id"]))
+        rol = str(usuario.get("rol") or ("Administrador" if usuario.get("es_administrador") else "Operador"))
+        return create_access_token(str(usuario["id"]), rol)

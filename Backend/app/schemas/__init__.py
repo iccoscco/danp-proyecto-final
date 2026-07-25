@@ -7,7 +7,7 @@ from app.schemas.detalle_pedido import (
     DetallePedidoResponse,
     DetallePedidoUpdate,
 )
-from app.schemas.oferta import OfertaCreate, OfertaResponse, OfertaUpdate
+from app.schemas.oferta import OfertaExistenteCreate, OfertaResponse, OfertaUpdate
 from app.schemas.pedido import PedidoCreate, PedidoResponse, PedidoUpdate
 from app.schemas.producto import ProductoCreate, ProductoResponse, ProductoUpdate
 from app.schemas.usuario import UsuarioCreate, UsuarioResponse, UsuarioUpdate
@@ -20,7 +20,7 @@ __all__ = [
     "DetallePedidoCreate",
     "DetallePedidoResponse",
     "DetallePedidoUpdate",
-    "OfertaCreate",
+    "OfertaExistenteCreate",
     "OfertaResponse",
     "OfertaUpdate",
     "PedidoCreate",

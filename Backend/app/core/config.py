@@ -23,6 +23,7 @@ class Settings:
     supabase_url: str | None = os.getenv("SUPABASE_URL")
     supabase_key: str | None = os.getenv("SUPABASE_KEY")
     supabase_products_bucket: str = os.getenv("SUPABASE_PRODUCTS_BUCKET", "productos")
+    supabase_avatars_bucket: str = os.getenv("SUPABASE_AVATARS_BUCKET", "avatars")
     master_admin_email: str = os.getenv("MASTER_ADMIN_EMAIL", "mika@savebite.com")
     master_admin_password: str = os.getenv("MASTER_ADMIN_PASSWORD", "123456")
     frontend_origins: list[str] | None = None

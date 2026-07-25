@@ -1,11 +1,9 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import LayoutDashboard from "../../componentes/LayoutDashboard";
+import { solicitar as solicitarApi } from "../../utilidades/api";
 import styles from "./Productos.module.css";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 type Producto = {
   id: number;
@@ -39,7 +37,6 @@ async function comprimirImagen(archivo: File): Promise<File> {
 }
 
 export default function ProductosPage() {
-  const router = useRouter();
   const [productos, setProductos] = useState<Producto[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -49,36 +46,11 @@ export default function ProductosPage() {
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
 
-  async function solicitar(ruta: string, opciones: RequestInit = {}) {
-    const token = window.localStorage.getItem("access_token");
-    if (!token) {
-      router.replace("/login");
-      throw new Error("Tu sesión ha finalizado.");
-    }
-
-    const respuesta = await fetch(`${API_URL}${ruta}`, {
-      ...opciones,
-      headers: { Authorization: `Bearer ${token}`, ...opciones.headers },
-    });
-
-    if (respuesta.status === 401) {
-      window.localStorage.removeItem("access_token");
-      router.replace("/login");
-      throw new Error("Tu sesión ha finalizado.");
-    }
-
-    if (!respuesta.ok) {
-      const cuerpo = await respuesta.json().catch(() => null);
-      throw new Error(cuerpo?.detail ?? "No se pudo completar la operación.");
-    }
-    return respuesta;
-  }
-
   async function cargarProductos() {
     setCargando(true);
     setError("");
     try {
-      const respuesta = await solicitar("/productos/");
+      const respuesta = await solicitarApi("/productos/");
       setProductos(await respuesta.json());
     } catch (causa) {
       setError(causa instanceof Error ? causa.message : "No se pudieron cargar los productos.");
@@ -127,7 +99,7 @@ export default function ProductosPage() {
       }
 
       const editando = productoEnEdicion !== null;
-      await solicitar(editando ? `/productos/${productoEnEdicion.id}` : "/productos/", {
+      await solicitarApi(editando ? `/productos/${productoEnEdicion.id}` : "/productos/", {
         method: editando ? "PUT" : "POST",
         body: formulario,
       });
@@ -146,7 +118,7 @@ export default function ProductosPage() {
 
     setError("");
     try {
-      await solicitar(`/productos/${producto.id}`, { method: "DELETE" });
+      await solicitarApi(`/productos/${producto.id}`, { method: "DELETE" });
       setMensaje("Producto eliminado correctamente.");
       await cargarProductos();
     } catch (causa) {

@@ -13,6 +13,7 @@ def create_master_admin() -> None:
                 "correo": settings.master_admin_email,
                 "password_hash": get_password_hash(settings.master_admin_password),
                 "estado": "Activo",
+                "rol": "Administrador",
                 "es_administrador": True,
             }
         )

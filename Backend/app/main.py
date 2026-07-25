@@ -7,7 +7,9 @@ from app.core.bootstrap import create_master_admin
 from app.core.config import settings
 from app.routers import (
     auth_router,
+    auth_cliente_router,
     categorias_router,
+    clientes_router,
     ofertas_router,
     pedidos_router,
     productos_router,
@@ -32,8 +34,10 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(auth_cliente_router)
 app.include_router(usuarios_router)
 app.include_router(productos_router)
 app.include_router(categorias_router)
 app.include_router(ofertas_router)
 app.include_router(pedidos_router)
+app.include_router(clientes_router)
