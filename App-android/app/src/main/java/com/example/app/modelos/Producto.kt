@@ -3,25 +3,18 @@ package com.example.app.modelos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import com.google.gson.annotations.SerializedName
 
 data class Producto(
-
     val id: Int,
-
     val nombre: String,
-
     val categoria: String,
-
-    val precioOriginal: Double,
-
-    val precioOferta: Double,
-
-    val descuento: String,
-
-    val imagen: Int
-
+    val precio: Double,
+    val stock: Int,
+    @SerializedName("fecha_vencimiento")
+    val fechaVencimiento: String,
+    @SerializedName("imagen_url")
+    val imagenUrl: String?
 ) {
-
     var cantidad by mutableIntStateOf(1)
-
 }

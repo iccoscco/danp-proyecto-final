@@ -126,6 +126,16 @@ export default function ProductosPage() {
     }
   }
 
+  const categoriasOficiales = [
+    "Panadería",
+    "Bebidas",
+    "Frutas",
+    "Comidas",
+    "Lácteos",
+    "Postres",
+    "Snacks"
+  ];
+
   return (
     <LayoutDashboard enlaceActivo="/productos">
       <section className={styles.encabezado}>
@@ -207,11 +217,19 @@ export default function ProductosPage() {
 
             <form className={styles.formulario} key={productoEnEdicion?.id ?? "nuevo"} onSubmit={guardarProducto}>
               <label>Nombre<input defaultValue={productoEnEdicion?.nombre} name="nombre" required /></label>
-              <label>Categoría<input defaultValue={productoEnEdicion?.categoria} name="categoria" required /></label>
+              <label>
+                Categoría
+                <select defaultValue={productoEnEdicion?.categoria} name="categoria" required>
+                  <option value="" disabled>Selecciona una categoría</option>
+                  {categoriasOficiales.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </label>
               <label>Precio<input defaultValue={productoEnEdicion?.precio} min="0" name="precio" required step="0.01" type="number" /></label>
               <label>Stock<input defaultValue={productoEnEdicion?.stock} min="0" name="stock" required type="number" /></label>
               <label>Fecha de vencimiento<input defaultValue={productoEnEdicion?.fecha_vencimiento} name="fecha_vencimiento" required type="date" /></label>
-              <label>Imagen del producto<input accept="image/*" name="imagen" type="file" /></label>
+              <label>Imagen del producto<input accept="image/*" className={styles.inputArchivo} name="imagen" type="file" /></label>
               <p className={styles.ayudaImagen}>La imagen se reduce automáticamente antes de guardarse.</p>
               <button className={styles.botonPrimario} disabled={guardando} type="submit">
                 {guardando ? "Guardando..." : "Guardar"}

@@ -1,7 +1,6 @@
 package com.example.app.interfaz.componentes
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -10,15 +9,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.app.datos.RepositorioCarritoFalso
 import com.example.app.modelos.Producto
 
 @Composable
 fun TarjetaProducto(producto: Producto) {
-
     val context = LocalContext.current
 
     Card(
@@ -27,16 +25,14 @@ fun TarjetaProducto(producto: Producto) {
             .padding(vertical = 8.dp),
         shape = RoundedCornerShape(18.dp)
     ) {
-
         Row(
             modifier = Modifier.padding(16.dp)
         ) {
-
-            Image(
-                painter = painterResource(producto.imagen),
+            AsyncImage(
+                model = producto.imagenUrl,
                 contentDescription = producto.nombre,
                 modifier = Modifier
-                    .size(90.dp)
+                    .size(100.dp)
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -46,59 +42,52 @@ fun TarjetaProducto(producto: Producto) {
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-
                 Text(
                     text = producto.nombre,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = producto.categoria,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
 
-                AssistChip(
-                    onClick = { },
-                    label = {
-                        Text(producto.descuento)
-                    }
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Vence: ${producto.fechaVencimiento}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "S/. ${producto.precioOriginal}",
-                    textDecoration = TextDecoration.LineThrough
-                )
-
-                Text(
-                    text = "S/. ${producto.precioOferta}",
+                    text = "S/. ${String.format("%.2f", producto.precio)}",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.ExtraBold
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp),
                     onClick = {
-
                         RepositorioCarritoFalso.agregar(producto)
-
                         Toast.makeText(
                             context,
                             "${producto.nombre} agregado al carrito",
                             Toast.LENGTH_SHORT
                         ).show()
-
                     }
                 ) {
-
-                    Text("🛒 Agregar al carrito")
-
+                    Text("🛒 Agregar")
                 }
-
             }
-
         }
-
     }
-
 }

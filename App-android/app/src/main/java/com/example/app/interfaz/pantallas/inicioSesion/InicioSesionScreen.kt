@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.app.datos.SesionManager
 import com.example.app.datos.repositorios.RepositorioAutenticacion
 import com.example.app.navegacion.Rutas
 import kotlinx.coroutines.launch
@@ -21,6 +22,7 @@ fun InicioSesionScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val repositorio = remember { RepositorioAutenticacion() }
+    val sesionManager = remember { SesionManager(context) }
 
     var correo by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
@@ -102,9 +104,13 @@ fun InicioSesionScreen(
                     val resultado = repositorio.iniciarSesion(correo, contrasena)
                     cargando = false
                     resultado.onSuccess { token ->
-                        Toast.makeText(context, "Bienvenido a SaveBite", Toast.LENGTH_SHORT).show()
-                        // Aquí se podría guardar el token si fuera necesario
-                        navController.navigate(Rutas.INICIO)
+                        scope.launch {
+                            sesionManager.guardarToken(token)
+                            Toast.makeText(context, "Bienvenido a SaveBite", Toast.LENGTH_SHORT).show()
+                            navController.navigate(Rutas.INICIO) {
+                                popUpTo(Rutas.LOGIN) { inclusive = true }
+                            }
+                        }
                     }.onFailure {
                         Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_LONG).show()
                     }

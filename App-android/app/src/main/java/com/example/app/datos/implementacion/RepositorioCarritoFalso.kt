@@ -32,13 +32,9 @@ object RepositorioCarritoFalso {
     }
 
     fun total(): Double {
-
         return carrito.sumOf {
-
-            it.precioOferta * it.cantidad
-
+            it.precio * it.cantidad
         }
-
     }
 
     fun vaciar() {

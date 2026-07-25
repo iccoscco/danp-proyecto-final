@@ -1,24 +1,34 @@
 package com.example.app.interfaz.pantallas.productos
 
+import android.widget.Toast
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.app.datos.RepositorioProductosFalso
+import com.example.app.datos.SesionManager
+import com.example.app.datos.red.RetrofitClient
 import com.example.app.interfaz.componentes.TarjetaProducto
+import com.example.app.modelos.Producto
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProductosScreen() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val sesionManager = remember { SesionManager(context) }
 
     var busqueda by remember { mutableStateOf("") }
-
     var categoriaSeleccionada by remember { mutableStateOf("Todos") }
+    var productos by remember { mutableStateOf<List<Producto>>(emptyList()) }
+    var cargando by remember { mutableStateOf(false) }
 
     val categorias = listOf(
         "Todos",
@@ -31,20 +41,38 @@ fun ProductosScreen() {
         "Snacks"
     )
 
-    val productos = RepositorioProductosFalso.obtenerProductos()
+    fun cargarProductos() {
+        cargando = true
+        scope.launch {
+            try {
+                val token = sesionManager.token.first()
+                if (token == null) {
+                    Toast.makeText(context, "Sesión no válida", Toast.LENGTH_SHORT).show()
+                    cargando = false
+                    return@launch
+                }
 
-    val productosFiltrados = productos.filter {
+                val response = RetrofitClient.productoApi.obtenerProductos("Bearer $token")
+                if (response.isSuccessful) {
+                    productos = response.body() ?: emptyList()
+                } else {
+                    Toast.makeText(context, "Error al cargar productos", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error de red: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                cargando = false
+            }
+        }
+    }
 
-        (categoriaSeleccionada == "Todos" ||
-                it.categoria == categoriaSeleccionada)
+    LaunchedEffect(Unit) {
+        cargarProductos()
+    }
 
-                &&
-
-                it.nombre.contains(
-                    busqueda,
-                    ignoreCase = true
-                )
-
+    val productosFiltrados = productos.filter { producto ->
+        (categoriaSeleccionada == "Todos" || producto.categoria == categoriaSeleccionada) &&
+        producto.nombre.contains(busqueda, ignoreCase = true)
     }
 
     Column(
@@ -52,7 +80,6 @@ fun ProductosScreen() {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-
         Text(
             text = "🛍 Productos",
             style = MaterialTheme.typography.headlineMedium
@@ -62,112 +89,52 @@ fun ProductosScreen() {
 
         OutlinedTextField(
             value = busqueda,
-            onValueChange = {
-                busqueda = it
-            },
-            label = {
-                Text("Buscar productos")
-            },
+            onValueChange = { busqueda = it },
+            label = { Text("Buscar productos") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         Row(
-            modifier = Modifier.horizontalScroll(
-                rememberScrollState()
-            )
+            modifier = Modifier.horizontalScroll(rememberScrollState())
         ) {
-
             categorias.forEach { categoria ->
-
                 FilterChip(
-
                     selected = categoria == categoriaSeleccionada,
-
-                    onClick = {
-
-                        categoriaSeleccionada = categoria
-
-                    },
-
-                    label = {
-
-                        Text(categoria)
-
-                    }
-
+                    onClick = { categoriaSeleccionada = categoria },
+                    label = { Text(categoria) }
                 )
-
                 Spacer(modifier = Modifier.width(8.dp))
-
             }
-
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text(
-            text = "⭐ Recomendados",
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-
-            items(productos.take(3)) { producto ->
-
-                Card(
-                    modifier = Modifier.width(180.dp)
-                ) {
-
-                    Column(
-                        modifier = Modifier.padding(12.dp)
-                    ) {
-
-                        Text(
-                            text = producto.nombre,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        Text(
-                            text = "S/. ${producto.precioOferta}"
-                        )
-
-                    }
-
+        if (cargando) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            if (productosFiltrados.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = if (categoriaSeleccionada == "Todos") 
+                            "No hay productos disponibles" 
+                            else "No hay productos en la categoría $categoriaSeleccionada",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
-
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
+                    items(productosFiltrados) { producto ->
+                        TarjetaProducto(producto)
+                    }
+                }
             }
-
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "Todos los productos",
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-
-            items(productosFiltrados) { producto ->
-
-                TarjetaProducto(producto)
-
-            }
-
-        }
-
     }
-
 }

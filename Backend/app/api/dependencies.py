@@ -24,12 +24,24 @@ def get_current_user(
     try:
         payload = decode_access_token(credentials.credentials)
         user_id = str(payload["sub"])
+        rol = str(payload.get("rol", "Administrador"))
     except (KeyError, TypeError, ValueError):
         raise unauthorized
 
-    user = SupabaseUsuarioRepository(get_supabase_client()).get_by_id(user_id)
+    client = get_supabase_client()
+    if rol == "Cliente":
+        from app.repositories.supabase_cliente import SupabaseClienteRepository
+        user = SupabaseClienteRepository(client).get_by_id(user_id)
+    else:
+        user = SupabaseUsuarioRepository(client).get_by_id(user_id)
+
     if user is None:
         raise unauthorized
+
+    # Asegurar que el rol esté en el objeto user para consistencia
+    if "rol" not in user:
+        user["rol"] = rol
+
     return user
 
 

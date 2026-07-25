@@ -70,7 +70,7 @@ fun CarritoScreen() {
                             Spacer(modifier = Modifier.height(6.dp))
 
                             Text(
-                                text = "Precio: S/. ${producto.precioOferta}"
+                                text = "Precio: S/. ${String.format("%.2f", producto.precio)}"
                             )
 
                             Spacer(modifier = Modifier.height(12.dp))
@@ -81,11 +81,9 @@ fun CarritoScreen() {
 
                                 Button(
                                     onClick = {
-
                                         if (producto.cantidad > 1) {
                                             producto.cantidad--
                                         }
-
                                     }
                                 ) {
                                     Text("-")
@@ -102,9 +100,7 @@ fun CarritoScreen() {
 
                                 Button(
                                     onClick = {
-
                                         producto.cantidad++
-
                                     }
                                 ) {
                                     Text("+")
@@ -115,9 +111,7 @@ fun CarritoScreen() {
                             Spacer(modifier = Modifier.height(12.dp))
 
                             Text(
-                                text = "Subtotal: S/. ${
-                                    producto.precioOferta * producto.cantidad
-                                }",
+                                text = "Subtotal: S/. ${String.format("%.2f", producto.precio * producto.cantidad)}",
                                 style = MaterialTheme.typography.titleMedium
                             )
 
@@ -125,27 +119,18 @@ fun CarritoScreen() {
 
                             OutlinedButton(
                                 onClick = {
-
                                     RepositorioCarritoFalso.eliminar(producto)
-
                                     carrito.remove(producto)
-
                                 }
                             ) {
-
                                 Text("🗑 Eliminar")
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
 
-            Divider()
+            HorizontalDivider()
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -155,11 +140,7 @@ fun CarritoScreen() {
             )
 
             Text(
-                text = "TOTAL: S/. ${
-                    carrito.sumOf {
-                        it.precioOferta * it.cantidad
-                    }
-                }",
+                text = "TOTAL: S/. ${String.format("%.2f", carrito.sumOf { it.precio * it.cantidad })}",
                 style = MaterialTheme.typography.headlineSmall
             )
 
