@@ -25,10 +25,15 @@ def get_pedidos(
     service: Service,
     current_user: Annotated[dict[str, object], Depends(get_current_user)]
 ) -> list[PedidoResponse]:
-    # Si es Cliente, solo ve sus pedidos. Si es Admin/Operador, ve todos.
+    pedidos = service.get_all()
+
+    # Si es Cliente, solo ve sus pedidos PAGADOS o COMPLETADOS.
     if current_user.get("rol") == "Cliente":
-        return service.get_by_cliente(str(current_user["id"]))
-    return service.get_all()
+        cliente_id = str(current_user["id"])
+        return [p for p in pedidos if str(p["cliente_id"]) == cliente_id and p["estado"] in ["Pagado", "Completado"]]
+
+    # Administrador ve TODOS (incluyendo Pendientes y Cancelados)
+    return pedidos
 
 
 @router.get("/{pedido_id}", response_model=PedidoResponse)

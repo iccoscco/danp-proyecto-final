@@ -28,6 +28,7 @@ class PedidoCreate(PedidoBase):
 class PedidoUpdate(BaseModel):
     estado: str | None = None
     total: Decimal | None = None
+    detalles: list[PedidoDetalleBase] | None = None
 
 
 class PedidoResponse(PedidoBase):

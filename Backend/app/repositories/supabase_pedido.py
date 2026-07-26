@@ -50,24 +50,42 @@ class SupabasePedidoRepository:
     def create(self, data: dict[str, Any], detalles: list[dict[str, Any]]) -> dict[str, Any]:
         # 1. Crear el pedido
         resp_pedido = self.client.table("pedidos").insert(data).execute()
+        if not resp_pedido.data:
+            raise Exception(f"Error al insertar pedido: {resp_pedido.error if hasattr(resp_pedido, 'error') else 'Sin datos'}")
+
         pedido_creado = resp_pedido.data[0]
 
         # 2. Crear los detalles
         for d in detalles:
             d["pedido_id"] = pedido_creado["id"]
 
-        self.client.table("pedido_detalles").insert(detalles).execute()
+        resp_detalles = self.client.table("pedido_detalles").insert(detalles).execute()
+        if not resp_detalles.data:
+            # Si fallan los detalles, intentamos borrar el pedido para no dejar basura
+            self.delete(pedido_creado["id"])
+            raise Exception(f"Error al insertar detalles: {resp_detalles.error if hasattr(resp_detalles, 'error') else 'Sin datos'}")
 
         return self.get_by_id(pedido_creado["id"]) or pedido_creado
 
-    def update(self, pedido_id: int, data: dict[str, Any]) -> dict[str, Any]:
+    def update(self, pedido_id: int, data: dict[str, Any], detalles: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+        # 1. Actualizar el pedido
         response = (
             self.client.table("pedidos")
             .update(data)
             .eq("id", pedido_id)
             .execute()
         )
-        return response.data[0]
+
+        # 2. Si vienen detalles, reemplazarlos
+        if detalles is not None:
+            # Borrar anteriores
+            self.client.table("pedido_detalles").delete().eq("pedido_id", pedido_id).execute()
+            # Insertar nuevos
+            for d in detalles:
+                d["pedido_id"] = pedido_id
+            self.client.table("pedido_detalles").insert(detalles).execute()
+
+        return self.get_by_id(pedido_id) or response.data[0]
 
     def delete(self, pedido_id: int) -> None:
         self.client.table("pedidos").delete().eq("id", pedido_id).execute()

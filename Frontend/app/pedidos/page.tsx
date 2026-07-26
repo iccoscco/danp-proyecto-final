@@ -38,6 +38,11 @@ export default function PedidosPage() {
 
   useEffect(() => {
     void cargarPedidos();
+    // Refresco automático cada 30 segundos para ver nuevos carritos (Pendientes)
+    const intervalo = setInterval(() => {
+      void cargarPedidos();
+    }, 30000);
+    return () => clearInterval(intervalo);
   }, []);
 
   async function eliminarPedido(id: number) {

@@ -34,7 +34,8 @@ fun CarritoScreen() {
     val carritoItems = RepositorioCarrito.productos
 
     fun realizarPedido() {
-        if (carritoItems.isEmpty()) return
+        val pedidoId = RepositorioCarrito.obtenerPedidoIdRemoto()
+        if (carritoItems.isEmpty() || pedidoId == null) return
         
         cargandoPedido = true
         scope.launch {
@@ -46,25 +47,51 @@ fun CarritoScreen() {
                     return@launch
                 }
 
-                val detalles = carritoItems.map {
-                    PedidoDetalleCreate(
-                        productoId = it.id,
-                        cantidad = it.cantidad,
-                        precioUnitario = it.precio
-                    )
-                }
-
-                val request = PedidoCreate(detalles = detalles, estado = "Pagado")
-                val response = RetrofitClient.pedidoApi.crearPedido("Bearer $token", request)
+                // Cambiamos el estado de "Pendiente" a "Pagado"
+                val response = RetrofitClient.pedidoApi.actualizarPedido(
+                    "Bearer $token", 
+                    pedidoId, 
+                    mapOf("estado" to "Pagado")
+                )
 
                 if (response.isSuccessful) {
-                    RepositorioCarrito.vaciar()
+                    RepositorioCarrito.vaciarLocalmente()
                     Toast.makeText(context, "¡Pedido Pagado! Entrega en 20min", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(context, "Error al procesar: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    val errorMsg = response.errorBody()?.string() ?: "Error desconocido"
+                    Toast.makeText(context, "Error: $errorMsg", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(context, "Error de red: ${e.message}", Toast.LENGTH_SHORT).show()
+            } finally {
+                cargandoPedido = false
+            }
+        }
+    }
+
+    fun cancelarCarrito() {
+        val pedidoId = RepositorioCarrito.obtenerPedidoIdRemoto()
+        if (pedidoId == null) {
+            RepositorioCarrito.vaciarLocalmente()
+            return
+        }
+
+        cargandoPedido = true
+        scope.launch {
+            try {
+                val token = sesionManager.token.first() ?: return@launch
+                
+                // Cambiamos el estado a "Cancelado"
+                RetrofitClient.pedidoApi.actualizarPedido(
+                    "Bearer $token", 
+                    pedidoId, 
+                    mapOf("estado" to "Cancelado")
+                )
+                
+                RepositorioCarrito.vaciarLocalmente()
+                Toast.makeText(context, "Carrito cancelado", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error al cancelar", Toast.LENGTH_SHORT).show()
             } finally {
                 cargandoPedido = false
             }
@@ -115,25 +142,37 @@ fun CarritoScreen() {
                                 Text(text = producto.nombre, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                 Text(text = "Precio: S/. ${String.format("%.2f", producto.precio)}", style = MaterialTheme.typography.bodyMedium)
                                 
+                                val cantidad = RepositorioCarrito.obtenerCantidad(producto.id)
+
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.padding(top = 8.dp)
                                 ) {
                                     IconButton(
-                                        onClick = { if (producto.cantidad > 1) producto.cantidad-- },
+                                        onClick = {
+                                            scope.launch {
+                                                val token = sesionManager.token.first()
+                                                RepositorioCarrito.decrementar(producto.id, token)
+                                            }
+                                        },
                                         modifier = Modifier.size(32.dp)
                                     ) {
                                         Text("-", style = MaterialTheme.typography.headlineSmall)
                                     }
                                     
                                     Text(
-                                        text = producto.cantidad.toString(),
+                                        text = cantidad.toString(),
                                         style = MaterialTheme.typography.titleMedium,
                                         modifier = Modifier.padding(horizontal = 12.dp)
                                     )
                                     
                                     IconButton(
-                                        onClick = { producto.cantidad++ },
+                                        onClick = {
+                                            scope.launch {
+                                                val token = sesionManager.token.first()
+                                                RepositorioCarrito.incrementar(producto.id, token)
+                                            }
+                                        },
                                         modifier = Modifier.size(32.dp)
                                     ) {
                                         Text("+", style = MaterialTheme.typography.headlineSmall)
@@ -142,7 +181,7 @@ fun CarritoScreen() {
                                     Spacer(modifier = Modifier.weight(1f))
 
                                     Text(
-                                        text = "S/. ${String.format("%.2f", producto.precio * producto.cantidad)}",
+                                        text = "S/. ${String.format("%.2f", producto.precio * cantidad)}",
                                         style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Bold
@@ -151,7 +190,10 @@ fun CarritoScreen() {
                                 
                                 TextButton(
                                     onClick = {
-                                        RepositorioCarrito.eliminar(producto)
+                                        scope.launch {
+                                            val token = sesionManager.token.first()
+                                            RepositorioCarrito.eliminar(producto, token)
+                                        }
                                     },
                                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                                 ) {
@@ -168,7 +210,11 @@ fun CarritoScreen() {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = "Productos:", style = MaterialTheme.typography.bodyLarge)
-                    Text(text = "${carritoItems.sumOf { it.cantidad }}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "${carritoItems.sumOf { RepositorioCarrito.obtenerCantidad(it.id) }}", 
+                        style = MaterialTheme.typography.bodyLarge, 
+                        fontWeight = FontWeight.Bold
+                    )
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = "TOTAL:", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
@@ -189,7 +235,7 @@ fun CarritoScreen() {
                 enabled = !cargandoPedido,
                 onClick = { realizarPedido() }
             ) {
-                if (cargandoPedido) CircularProgressIndicator(size = 24.dp, color = MaterialTheme.colorScheme.onPrimary)
+                if (cargandoPedido) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
                 else Text("💳 Pagar ahora", style = MaterialTheme.typography.titleMedium)
             }
             
@@ -199,14 +245,10 @@ fun CarritoScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 enabled = !cargandoPedido,
-                onClick = {
-                    RepositorioCarrito.vaciar()
-                    Toast.makeText(context, "Carrito cancelado", Toast.LENGTH_SHORT).show()
-                }
+                onClick = { cancelarCarrito() }
             ) {
                 Text("❌ Cancelar carrito", color = MaterialTheme.colorScheme.error)
             }
         }
     }
-}
 }

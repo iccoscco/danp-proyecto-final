@@ -24,13 +24,17 @@ returns trigger as $$
 declare
   nuevo_numero text;
 begin
-  select 'Pedido-' || lpad(coalesce(count(*), 0) + 1, 4, '0')
+  -- Corregimos el casting de lpad para evitar el error 42883
+  select 'Pedido-' || lpad((coalesce(count(*), 0) + 1)::text, 4, '0')
   from public.pedidos into nuevo_numero;
 
   new.numero_pedido := nuevo_numero;
   return new;
 end;
 $$ language plpgsql;
+
+-- Eliminamos el trigger si ya existe para poder recrearlo
+drop trigger if exists tr_generar_numero_pedido on public.pedidos;
 
 create trigger tr_generar_numero_pedido
 before insert on public.pedidos

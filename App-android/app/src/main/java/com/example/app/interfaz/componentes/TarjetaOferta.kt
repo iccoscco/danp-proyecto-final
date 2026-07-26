@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,10 +19,14 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.app.datos.repositorios.RepositorioCarrito
 import com.example.app.modelos.Oferta
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Composable
 fun TarjetaOferta(oferta: Oferta) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val sesionManager = remember { com.example.app.datos.SesionManager(context) }
     val precioOriginal = oferta.precioOriginal ?: 0.0
     val descuento = oferta.descuento
     val precioFinal = precioOriginal * (1 - descuento / 100)
@@ -114,8 +120,6 @@ fun TarjetaOferta(oferta: Oferta) {
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     onClick = {
-                        // Convertir Oferta a Producto para el carrito (o manejar ambos en el repo)
-                        // Para simplificar, agregamos como producto usando el ID de producto
                         val p = com.example.app.modelos.Producto(
                             id = oferta.productoId,
                             nombre = oferta.nombreProducto ?: oferta.nombre,
@@ -125,7 +129,10 @@ fun TarjetaOferta(oferta: Oferta) {
                             fechaVencimiento = oferta.fechaVencimiento ?: "",
                             imagenUrl = oferta.imagenUrl
                         )
-                        RepositorioCarrito.agregar(p)
+                        scope.launch {
+                            val token = sesionManager.token.first()
+                            RepositorioCarrito.agregar(p, token)
+                        }
                         Toast.makeText(
                             context,
                             "🔥 Oferta agregada!",

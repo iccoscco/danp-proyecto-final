@@ -21,6 +21,6 @@ interface PedidoApi {
     suspend fun actualizarPedido(
         @Header("Authorization") token: String,
         @Path("id") id: Int,
-        @Body updates: Map<String, String>
+        @Body updates: Any // Usamos Any para soportar Map o PedidoUpdate
     ): Response<PedidoResponse>
 }

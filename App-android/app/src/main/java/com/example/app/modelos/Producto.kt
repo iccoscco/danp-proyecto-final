@@ -15,6 +15,4 @@ data class Producto(
     val fechaVencimiento: String,
     @SerializedName("imagen_url")
     val imagenUrl: String?
-) {
-    var cantidad by mutableIntStateOf(1)
-}
+)

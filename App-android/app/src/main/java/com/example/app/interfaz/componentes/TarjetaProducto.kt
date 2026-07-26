@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -14,10 +16,15 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.app.datos.repositorios.RepositorioCarrito
 import com.example.app.modelos.Producto
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Composable
 fun TarjetaProducto(producto: Producto) {
     val context = LocalContext.current
+
+    val scope = rememberCoroutineScope()
+    val sesionManager = remember { com.example.app.datos.SesionManager(context) }
 
     Card(
         modifier = Modifier
@@ -78,7 +85,10 @@ fun TarjetaProducto(producto: Producto) {
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     onClick = {
-                        RepositorioCarrito.agregar(producto)
+                        scope.launch {
+                            val token = sesionManager.token.first()
+                            RepositorioCarrito.agregar(producto, token)
+                        }
                         Toast.makeText(
                             context,
                             "🛒 ${producto.nombre} agregado al carrito",
