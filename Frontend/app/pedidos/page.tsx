@@ -159,9 +159,9 @@ export default function PedidosPage() {
               </label>
               <label>Estado
                 <select defaultValue={pedidoEnEdicion.estado} name="estado">
-                  <option value="Pendiente">Pendiente</option>
-                  <option value="Pagado">Pagado (En preparación)</option>
-                  <option value="Completado">Completado (Entregado)</option>
+                  <option value="Pendiente">Pendiente (En carrito)</option>
+                  <option value="Pagado">Pagado</option>
+                  <option value="Completado">Completado</option>
                   <option value="Cancelado">Cancelado</option>
                 </select>
               </label>

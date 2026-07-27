@@ -38,7 +38,7 @@ class SupabasePedidoService:
         pedido_data = {
             "cliente_id": cliente_id,
             "total": float(total),
-            "estado": "Pagado" # Forzamos Pagado para que salga en Mis Pedidos
+            "estado": data.get("estado", "Pendiente")
         }
 
         return self.repository.create(pedido_data, detalles)
