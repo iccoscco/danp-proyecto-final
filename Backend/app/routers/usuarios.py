@@ -32,6 +32,7 @@ def _to_response(usuario: dict[str, object]) -> UsuarioResponse:
         genero=usuario.get("genero"),
         estado=str(usuario.get("estado") or "Activo"),
         es_administrador=bool(usuario.get("es_administrador") or usuario.get("rol") == "Administrador"),
+        foto_url=usuario.get("foto_url"),
     )
 
 

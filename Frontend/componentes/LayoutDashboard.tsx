@@ -3,6 +3,17 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import Image from "next/image";
+import {
+  IconLayoutDashboard,
+  IconBox,
+  IconUsers,
+  IconUsersGroup,
+  IconShoppingCart,
+  IconTag,
+  IconUserCircle,
+  IconLogout
+} from "@tabler/icons-react";
 import { cerrarSesion, esAdministrador, obtenerUsuarioActual, type UsuarioActual } from "../utilidades/api";
 import styles from "./LayoutDashboard.module.css";
 
@@ -11,16 +22,21 @@ type LayoutDashboardProps = {
   enlaceActivo?: string;
 };
 
-type Enlace = { etiqueta: string; href: string; soloAdmin?: boolean };
+type Enlace = {
+  etiqueta: string;
+  href: string;
+  soloAdmin?: boolean;
+  Icono: React.ElementType;
+};
 
 const enlaces: Enlace[] = [
-  { etiqueta: "Dashboard", href: "/dashboard" },
-  { etiqueta: "Productos", href: "/productos" },
-  { etiqueta: "Usuarios", href: "/usuarios", soloAdmin: true },
-  { etiqueta: "Clientes", href: "/clientes", soloAdmin: true },
-  { etiqueta: "Pedidos", href: "/pedidos" },
-  { etiqueta: "Ofertas", href: "/ofertas" },
-  { etiqueta: "Perfil", href: "/perfil" },
+  { etiqueta: "Dashboard", href: "/dashboard", Icono: IconLayoutDashboard },
+  { etiqueta: "Productos", href: "/productos", Icono: IconBox },
+  { etiqueta: "Usuarios", href: "/usuarios", soloAdmin: true, Icono: IconUsers },
+  { etiqueta: "Clientes", href: "/clientes", soloAdmin: true, Icono: IconUsersGroup },
+  { etiqueta: "Pedidos", href: "/pedidos", Icono: IconShoppingCart },
+  { etiqueta: "Ofertas", href: "/ofertas", Icono: IconTag },
+  { etiqueta: "Perfil", href: "/perfil", Icono: IconUserCircle },
 ];
 
 export default function LayoutDashboard({ children, enlaceActivo = "/dashboard" }: LayoutDashboardProps) {
@@ -43,7 +59,15 @@ export default function LayoutDashboard({ children, enlaceActivo = "/dashboard" 
     <div className={styles.panel}>
       <aside className={styles.sidebar} aria-label="Navegación principal">
         <Link className={styles.marca} href="/dashboard">
-          Panel Admin
+          <Image
+            src="/savebite.png"
+            alt="SaveBite Logo"
+            width={32}
+            height={32}
+            className={styles.sidebarLogo}
+            priority
+          />
+          <span>SaveBite</span>
         </Link>
 
         <nav className={styles.navegacion}>
@@ -53,21 +77,41 @@ export default function LayoutDashboard({ children, enlaceActivo = "/dashboard" 
               href={enlace.href}
               key={enlace.href}
             >
-              {enlace.etiqueta}
+              <enlace.Icono size={20} className={styles.iconoEnlace} />
+              <span>{enlace.etiqueta}</span>
             </Link>
           ))}
         </nav>
 
         <button className={styles.cerrarSesion} onClick={() => cerrarSesion()} type="button">
-          Cerrar sesión
+          <IconLogout size={20} className={styles.iconoEnlace} />
+          <span>Cerrar sesión</span>
         </button>
       </aside>
 
       <div className={styles.contenido}>
         <header className={styles.navbar}>
-          <p>Panel administrativo</p>
+          <p>Panel administrativo SaveBite</p>
           <div className={styles.avatar} aria-label="Perfil de usuario" title={usuario?.nombre}>
-            {inicial}
+            {usuario?.foto_url ? (
+              <img
+                src={usuario.foto_url}
+                alt="Foto de perfil"
+                className={styles.avatarImg}
+                style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={(e) => {
+                  console.error("Error avatar header:", usuario?.foto_url);
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.textContent = inicial;
+                  }
+                }}
+              />
+            ) : (
+              inicial
+            )}
           </div>
         </header>
         <main className={styles.principal}>{children}</main>

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,15 +17,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.app.datos.SesionManager
 import com.example.app.datos.red.RetrofitClient
 import com.example.app.modelos.PedidoResponse
+import com.example.app.ui.theme.VerdePrincipal
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MisPedidosScreen() {
+fun MisPedidosScreen(navController: NavHostController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val sesionManager = remember { SesionManager(context) }
@@ -75,129 +80,143 @@ fun MisPedidosScreen() {
         cargarPedidos()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "📦 Mis Pedidos",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        if (cargando) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else if (pedidos.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Aún no has realizado pedidos.")
-            }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                items(pedidos) { pedido ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = CardDefaults.cardElevation(2.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = pedido.numeroPedido,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Surface(
-                                    color = when(pedido.estado) {
-                                        "Pagado" -> Color(0xFFE3F2FD)
-                                        "Completado" -> Color(0xFFE8F5E9)
-                                        "Cancelado" -> Color(0xFFFFEBEE)
-                                        else -> Color(0xFFFFF3E0)
-                                    },
-                                    shape = RoundedCornerShape(99.dp)
-                                ) {
-                                    Text(
-                                        text = pedido.estado,
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = when(pedido.estado) {
-                                            "Pagado" -> Color(0xFF1976D2)
-                                            "Completado" -> Color(0xFF2E7D32)
-                                            "Cancelado" -> Color(0xFFC62828)
-                                            else -> Color(0xFFE65100)
-                                        }
-                                    )
-                                }
-                            }
-
-                            if (pedido.estado == "Pagado") {
-                                Text(
-                                    text = "🛵 Entrega en 20min aprox.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(top = 4.dp)
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            // Mostrar items del pedido
-                            pedido.detalles.forEach { detalle ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Mis Pedidos",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Regresar")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+        ) {
+            if (cargando) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = VerdePrincipal)
+                }
+            } else if (pedidos.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = "Aún no has realizado pedidos.", color = Color(0xFF64748B))
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
+                    items(pedidos) { pedido ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(2.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
                                 Row(
-                                    modifier = Modifier.padding(vertical = 4.dp),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    AsyncImage(
-                                        model = detalle.imagenUrl,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
                                     Text(
-                                        text = "${detalle.cantidad}x ${detalle.nombreItem}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Text(
-                                        text = "S/. ${String.format("%.2f", detalle.precioUnitario * detalle.cantidad)}",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        text = pedido.numeroPedido,
+                                        style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold
                                     )
-                                }
-                            }
-
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Total: S/. ${String.format("%.2f", pedido.total)}",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                
-                                if (pedido.estado == "Pagado") {
-                                    Button(
-                                        onClick = { marcarRecibido(pedido.id) },
-                                        shape = RoundedCornerShape(8.dp)
+                                    Surface(
+                                        color = when(pedido.estado) {
+                                            "Pagado" -> Color(0xFFE3F2FD)
+                                            "Completado" -> Color(0xFFE8F5E9)
+                                            "Cancelado" -> Color(0xFFFFEBEE)
+                                            else -> Color(0xFFFFF3E0)
+                                        },
+                                        shape = RoundedCornerShape(99.dp)
                                     ) {
-                                        Text("Pedido recibido")
+                                        Text(
+                                            text = pedido.estado,
+                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = when(pedido.estado) {
+                                                "Pagado" -> Color(0xFF1976D2)
+                                                "Completado" -> Color(0xFF2E7D32)
+                                                "Cancelado" -> Color(0xFFC62828)
+                                                else -> Color(0xFFE65100)
+                                            }
+                                        )
+                                    }
+                                }
+
+                                if (pedido.estado == "Pagado") {
+                                    Text(
+                                        text = "🛵 Entrega en 20min aprox.",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = VerdePrincipal,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // Mostrar items del pedido
+                                pedido.detalles.forEach { detalle ->
+                                    Row(
+                                        modifier = Modifier.padding(vertical = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        AsyncImage(
+                                            model = detalle.imagenUrl,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Text(
+                                            text = "${detalle.cantidad}x ${detalle.nombreItem}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Text(
+                                            text = "S/. ${String.format("%.2f", detalle.precioUnitario * detalle.cantidad)}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+
+                                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFE2E8F0))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Total: S/. ${String.format("%.2f", pedido.total)}",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = VerdePrincipal
+                                    )
+
+                                    if (pedido.estado == "Pagado") {
+                                        Button(
+                                            onClick = { marcarRecibido(pedido.id) },
+                                            shape = RoundedCornerShape(8.dp),
+                                            colors = ButtonDefaults.buttonColors(containerColor = VerdePrincipal)
+                                        ) {
+                                            Text("Pedido recibido")
+                                        }
                                     }
                                 }
                             }

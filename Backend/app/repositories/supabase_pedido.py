@@ -87,8 +87,77 @@ class SupabasePedidoRepository:
 
         return self.get_by_id(pedido_id) or response.data[0]
 
-    def delete(self, pedido_id: int) -> None:
-        self.client.table("pedidos").delete().eq("id", pedido_id).execute()
+    def get_stats(self) -> dict[str, Any]:
+        from datetime import datetime, timedelta
+
+        # 1. Ventas de la semana (últimos 7 días, solo Pagados o Completados)
+        hoy = datetime.now()
+        hace_7_dias = (hoy - timedelta(days=7)).isoformat()
+
+        pedidos_recientes = (
+            self.client.table("pedidos")
+            .select("fecha, total, estado")
+            .gte("fecha", hace_7_dias)
+            .in_("estado", ["Pagado", "Completado"])
+            .execute()
+        )
+
+        # Agrupar por día
+        ventas_map = {}
+        for i in range(7):
+            fecha = (hoy - timedelta(days=i)).strftime("%Y-%m-%d")
+            ventas_map[fecha] = 0.0
+
+        for p in pedidos_recientes.data:
+            fecha_p = p["fecha"].split("T")[0]
+            if fecha_p in ventas_map:
+                ventas_map[fecha_p] += float(p["total"])
+
+        ventas_semana = [{"fecha": k, "total": v} for k, v in sorted(ventas_map.items())]
+
+        # 2. Pedidos por estado (TODOS)
+        todos_pedidos = self.client.table("pedidos").select("estado").execute()
+        estados_count = {"Pendiente": 0, "Pagado": 0, "Completado": 0, "Cancelado": 0}
+        for p in todos_pedidos.data:
+            est = p["estado"]
+            if est in estados_count:
+                estados_count[est] += 1
+
+        # 3. Conteos totales
+        prod_count = self.client.table("productos").select("id", count="exact").execute().count
+        user_count = self.client.table("usuarios").select("id", count="exact").execute().count
+        ofer_count = self.client.table("ofertas").select("id", count="exact").execute().count
+
+        # 4. Últimos 4 pedidos
+        ultimos = (
+            self.client.table("pedidos")
+            .select("numero_pedido, total, estado, clientes(nombre)")
+            .order("fecha", desc=True)
+            .limit(4)
+            .execute()
+        )
+
+        ultimos_formateados = []
+        for u in ultimos.data:
+            cliente_nombre = "Desconocido"
+            if u.get("clientes"):
+                cliente_nombre = u["clientes"].get("nombre", "Desconocido")
+
+            ultimos_formateados.append({
+                "numero_pedido": u["numero_pedido"],
+                "cliente": cliente_nombre,
+                "total": float(u["total"]),
+                "estado": u["estado"]
+            })
+
+        return {
+            "ventas_semana": ventas_semana,
+            "pedidos_por_estado": estados_count,
+            "total_productos": prod_count or 0,
+            "total_usuarios": user_count or 0,
+            "total_ofertas": ofer_count or 0,
+            "ultimos_pedidos": ultimos_formateados
+        }
 
     def _serialize_pedido(self, p: dict[str, Any]) -> dict[str, Any]:
         cliente = p.pop("clientes", None) or {}

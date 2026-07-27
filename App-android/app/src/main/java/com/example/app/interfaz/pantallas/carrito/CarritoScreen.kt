@@ -5,15 +5,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.app.datos.repositorios.RepositorioCarrito
 import com.example.app.datos.SesionManager
@@ -21,11 +25,13 @@ import com.example.app.datos.red.RetrofitClient
 import com.example.app.modelos.PedidoCreate
 import com.example.app.modelos.PedidoDetalleCreate
 import com.example.app.modelos.Producto
+import com.example.app.ui.theme.VerdePrincipal
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarritoScreen() {
+fun CarritoScreen(navController: NavHostController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val sesionManager = remember { SesionManager(context) }
@@ -98,156 +104,180 @@ fun CarritoScreen() {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "🛒 Mi Carrito",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Mi Carrito",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Regresar")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp)
+        ) {
+            if (carritoItems.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "Tu carrito está vacío.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color(0xFF64748B)
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(carritoItems) { producto ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(2.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            Row(modifier = Modifier.padding(12.dp)) {
+                                AsyncImage(
+                                    model = producto.imagenUrl,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
 
-        Spacer(modifier = Modifier.height(20.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
 
-        if (carritoItems.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Tu carrito está vacío.", style = MaterialTheme.typography.bodyLarge)
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(carritoItems) { producto ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = CardDefaults.cardElevation(2.dp)
-                    ) {
-                        Row(modifier = Modifier.padding(12.dp)) {
-                            AsyncImage(
-                                model = producto.imagenUrl,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .clip(RoundedCornerShape(8.dp)),
-                                contentScale = ContentScale.Crop
-                            )
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(text = producto.nombre, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                Text(text = "Precio: S/. ${String.format("%.2f", producto.precio)}", style = MaterialTheme.typography.bodyMedium)
-                                
-                                val cantidad = RepositorioCarrito.obtenerCantidad(producto.id)
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(top = 8.dp)
-                                ) {
-                                    IconButton(
-                                        onClick = {
-                                            scope.launch {
-                                                val token = sesionManager.token.first()
-                                                RepositorioCarrito.decrementar(producto.id, token)
-                                            }
-                                        },
-                                        modifier = Modifier.size(32.dp)
-                                    ) {
-                                        Text("-", style = MaterialTheme.typography.headlineSmall)
-                                    }
-                                    
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(text = producto.nombre, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                     Text(
-                                        text = cantidad.toString(),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        modifier = Modifier.padding(horizontal = 12.dp)
+                                        text = "Precio: S/. ${String.format("%.2f", producto.precio)}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color(0xFF64748B)
                                     )
-                                    
-                                    IconButton(
-                                        onClick = {
-                                            scope.launch {
-                                                val token = sesionManager.token.first()
-                                                RepositorioCarrito.incrementar(producto.id, token)
-                                            }
-                                        },
-                                        modifier = Modifier.size(32.dp)
+
+                                    val cantidad = RepositorioCarrito.obtenerCantidad(producto.id)
+
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(top = 8.dp)
                                     ) {
-                                        Text("+", style = MaterialTheme.typography.headlineSmall)
-                                    }
-
-                                    Spacer(modifier = Modifier.weight(1f))
-
-                                    Text(
-                                        text = "S/. ${String.format("%.2f", producto.precio * cantidad)}",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                                
-                                TextButton(
-                                    onClick = {
-                                        scope.launch {
-                                            val token = sesionManager.token.first()
-                                            RepositorioCarrito.eliminar(producto, token)
+                                        IconButton(
+                                            onClick = {
+                                                scope.launch {
+                                                    val token = sesionManager.token.first()
+                                                    RepositorioCarrito.decrementar(producto.id, token)
+                                                }
+                                            },
+                                            modifier = Modifier.size(32.dp)
+                                        ) {
+                                            Text("-", style = MaterialTheme.typography.headlineSmall, color = VerdePrincipal)
                                         }
-                                    },
-                                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                                ) {
-                                    Text("🗑 Eliminar")
+
+                                        Text(
+                                            text = cantidad.toString(),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            modifier = Modifier.padding(horizontal = 12.dp)
+                                        )
+
+                                        IconButton(
+                                            onClick = {
+                                                scope.launch {
+                                                    val token = sesionManager.token.first()
+                                                    RepositorioCarrito.incrementar(producto.id, token)
+                                                }
+                                            },
+                                            modifier = Modifier.size(32.dp)
+                                        ) {
+                                            Text("+", style = MaterialTheme.typography.headlineSmall, color = VerdePrincipal)
+                                        }
+
+                                        Spacer(modifier = Modifier.weight(1f))
+
+                                        Text(
+                                            text = "S/. ${String.format("%.2f", producto.precio * cantidad)}",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = VerdePrincipal,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+
+                                    TextButton(
+                                        onClick = {
+                                            scope.launch {
+                                                val token = sesionManager.token.first()
+                                                RepositorioCarrito.eliminar(producto, token)
+                                            }
+                                        },
+                                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFEF4444))
+                                    ) {
+                                        Text("🗑 Eliminar")
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color(0xFFE2E8F0))
 
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = "Productos:", style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        text = "${carritoItems.sumOf { RepositorioCarrito.obtenerCantidad(it.id) }}", 
-                        style = MaterialTheme.typography.bodyLarge, 
-                        fontWeight = FontWeight.Bold
-                    )
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(text = "Productos:", style = MaterialTheme.typography.bodyLarge, color = Color(0xFF64748B))
+                        Text(
+                            text = "${carritoItems.sumOf { RepositorioCarrito.obtenerCantidad(it.id) }}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(text = "TOTAL:", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "S/. ${String.format("%.2f", RepositorioCarrito.obtenerTotal())}",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = VerdePrincipal
+                        )
+                    }
                 }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = "TOTAL:", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                    Text(
-                        text = "S/. ${String.format("%.2f", RepositorioCarrito.obtenerTotal())}",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Button(
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = !cargandoPedido,
+                    colors = ButtonDefaults.buttonColors(containerColor = VerdePrincipal),
+                    onClick = { realizarPedido() }
+                ) {
+                    if (cargandoPedido) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                    else Text("💳 Pagar ahora", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
                 }
-            }
 
-            Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                enabled = !cargandoPedido,
-                onClick = { realizarPedido() }
-            ) {
-                if (cargandoPedido) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
-                else Text("💳 Pagar ahora", style = MaterialTheme.typography.titleMedium)
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedButton(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                enabled = !cargandoPedido,
-                onClick = { cancelarCarrito() }
-            ) {
-                Text("❌ Cancelar carrito", color = MaterialTheme.colorScheme.error)
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = !cargandoPedido,
+                    onClick = { cancelarCarrito() }
+                ) {
+                    Text("❌ Cancelar carrito", color = Color(0xFFEF4444))
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

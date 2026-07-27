@@ -10,7 +10,7 @@ class SupabaseUsuarioRepository:
     def get_all(self, search: str | None = None) -> list[dict[str, Any]]:
         response = (
             self.client.table("usuarios")
-            .select("id,nombre,correo,rol,genero,estado,es_administrador")
+            .select("id,nombre,correo,rol,genero,estado,es_administrador,foto_url,foto_path")
             .order("nombre")
             .execute()
         )

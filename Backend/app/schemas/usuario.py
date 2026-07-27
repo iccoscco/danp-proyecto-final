@@ -35,3 +35,4 @@ class UsuarioResponse(BaseModel):
     genero: str | None = None
     estado: str
     es_administrador: bool
+    foto_url: str | None = None

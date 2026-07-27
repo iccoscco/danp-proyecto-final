@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Panel administrativo",
+  title: "SaveBite - Panel Administrativo",
+  description: "Sistema de gestión de tienda SaveBite",
+  icons: {
+    icon: "/savebite.png",
+  },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="es">
       <body>{children}</body>

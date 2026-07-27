@@ -1,55 +1,87 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import LayoutDashboard from "../../componentes/LayoutDashboard";
 import GraficaBarras from "../../componentes/GraficaBarras";
 import GraficaEstados from "../../componentes/GraficaEstados";
+import { solicitar } from "../../utilidades/api";
 import styles from "./Dashboard.module.css";
 
-const resumen = [
-  { etiqueta: "Productos registrados", valor: "128" },
-  { etiqueta: "Usuarios registrados", valor: "842" },
-  { etiqueta: "Pedidos pendientes", valor: "24" },
-  { etiqueta: "Ofertas activas", valor: "16" },
-];
-
-const ultimosPedidos = [
-  { id: "Pedido 001", cliente: "María Torres", total: "S/ 86.50", estado: "Pendiente" },
-  { id: "Pedido 002", cliente: "Carlos Ruiz", total: "S/ 124.00", estado: "En proceso" },
-  { id: "Pedido 003", cliente: "Lucía Ramos", total: "S/ 59.90", estado: "Pendiente" },
-  { id: "Pedido 004", cliente: "Diego Flores", total: "S/ 210.00", estado: "En proceso" },
-];
-
-// Datos mock — reemplazar por fetch al backend cuando se conecte.
-const ventasSemana = [
-  { etiqueta: "Lun", valor: 32 },
-  { etiqueta: "Mar", valor: 45 },
-  { etiqueta: "Mié", valor: 28 },
-  { etiqueta: "Jue", valor: 56 },
-  { etiqueta: "Vie", valor: 61 },
-  { etiqueta: "Sáb", valor: 38 },
-  { etiqueta: "Dom", valor: 19 },
-];
-
-const pedidosEstado = [
-  { etiqueta: "Pendiente", valor: 24, color: "#f59e0b" },
-  { etiqueta: "En proceso", valor: 12, color: "#1769e0" },
-  { etiqueta: "Completado", valor: 86, color: "#16a34a" },
-];
+type Stats = {
+  ventas_semana: { fecha: string; total: number }[];
+  pedidos_por_estado: Record<string, number>;
+  total_productos: number;
+  total_usuarios: number;
+  total_ofertas: number;
+  ultimos_pedidos: { numero_pedido: string; cliente: string; total: number; estado: string }[];
+};
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [cargando, setCargando] = useState(true);
+
+  async function cargarStats() {
+    try {
+      const resp = await solicitar("/pedidos/stats");
+      if (resp.ok) {
+        setStats(await resp.json());
+      }
+    } catch (e) {
+      console.error("Error cargando dashboard:", e);
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  useEffect(() => {
+    void cargarStats();
+  }, []);
+
+  if (cargando || !stats) {
+    return (
+      <LayoutDashboard enlaceActivo="/dashboard">
+        <div style={{ padding: "40px", textAlign: "center" }}>Cargando estadísticas...</div>
+      </LayoutDashboard>
+    );
+  }
+
+  // Formatear datos para gráficas
+  const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+  const datosBarras = stats.ventas_semana.map(v => {
+    const d = new Date(v.fecha + "T12:00:00");
+    return {
+      etiqueta: diasSemana[d.getDay()],
+      valor: v.total
+    };
+  });
+
+  const datosEstados = [
+    { etiqueta: "Pendiente", valor: stats.pedidos_por_estado["Pendiente"] || 0, color: "#f59e0b" },
+    { etiqueta: "Pagado", valor: stats.pedidos_por_estado["Pagado"] || 0, color: "#1769e0" },
+    { etiqueta: "Completado", valor: stats.pedidos_por_estado["Completado"] || 0, color: "#16a34a" },
+    { etiqueta: "Cancelado", valor: stats.pedidos_por_estado["Cancelado"] || 0, color: "#ef4444" },
+  ];
+
+  const resumen = [
+    { etiqueta: "Productos registrados", valor: stats.total_productos },
+    { etiqueta: "Usuarios registrados", valor: stats.total_usuarios },
+    { etiqueta: "Ofertas activas", valor: stats.total_ofertas },
+    { etiqueta: "Pedidos en total", valor: Object.values(stats.pedidos_por_estado).reduce((a, b) => a + b, 0) },
+  ];
+
   return (
     <LayoutDashboard enlaceActivo="/dashboard">
       <section className={styles.encabezado}>
         <div>
           <p className={styles.etiqueta}>Vista general</p>
-          <h1>Dashboard</h1>
+          <h1>Dashboard Real</h1>
         </div>
       </section>
 
       {/* Gráficas */}
       <section className={styles.graficas} aria-label="Resumen gráfico">
-        <GraficaBarras titulo="Ventas de la semana" datos={ventasSemana} color="#1769e0" />
-        <GraficaEstados titulo="Pedidos por estado" datos={pedidosEstado} />
+        <GraficaBarras titulo="Ventas de la semana (S/)" datos={datosBarras} color="#1769e0" />
+        <GraficaEstados titulo="Pedidos por estado" datos={datosEstados} />
       </section>
 
       {/* Tarjetas */}
@@ -76,13 +108,18 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {ultimosPedidos.map((pedido) => (
-                <tr key={pedido.id}>
-                  <td>{pedido.id}</td>
+              {stats.ultimos_pedidos.map((pedido, idx) => (
+                <tr key={idx}>
+                  <td>{pedido.numero_pedido}</td>
                   <td>{pedido.cliente}</td>
-                  <td>{pedido.total}</td>
+                  <td>S/ {pedido.total.toFixed(2)}</td>
                   <td>
-                    <span className={styles.estado}>{pedido.estado}</span>
+                    <span className={`${styles.estado} ${
+                      pedido.estado === 'Pendiente' ? styles.estadoPendiente :
+                      pedido.estado === 'Pagado' ? styles.estadoPagado :
+                      pedido.estado === 'Completado' ? styles.estadoCompletado :
+                      styles.estadoCancelado
+                    }`}>{pedido.estado}</span>
                   </td>
                 </tr>
               ))}

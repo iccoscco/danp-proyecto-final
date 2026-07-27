@@ -108,11 +108,14 @@
   display: inline-block;
   padding: 5px 10px;
   border-radius: 999px;
-  background: #eaf3ff;
-  color: var(--color-azul);
   font-size: 12px;
   font-weight: 700;
 }
+
+.estadoPendiente { background: #fff1dd; color: #c56a00; }
+.estadoPagado { background: #e0f2fe; color: #0369a1; }
+.estadoCompletado { background: #e7f8ed; color: #16803c; }
+.estadoCancelado { background: #feeceb; color: #c83b32; }
 
 @media (max-width: 760px) {
   .graficas {

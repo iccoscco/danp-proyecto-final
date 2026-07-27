@@ -22,6 +22,7 @@ type Usuario = {
   rol: Rol;
   genero: Genero | null;
   estado: Estado;
+  foto_url: string | null;
 };
 
 /** Muestra el rol concordando con el género: Femenino + Operador -> "Operadora". */
@@ -61,7 +62,9 @@ export default function UsuariosPage() {
     setError("");
     try {
       const respuesta = await solicitar("/usuarios/");
-      setUsuarios(await respuesta.json());
+      const datos = await respuesta.json();
+      console.log("Usuarios recibidos del servidor:", datos); // DEBUG LOG
+      setUsuarios(datos);
     } catch (causa) {
       setError(causa instanceof Error ? causa.message : "No se pudieron cargar los usuarios.");
     } finally {
@@ -151,6 +154,7 @@ export default function UsuariosPage() {
   }
 
   return (
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
     <LayoutDashboard enlaceActivo="/usuarios">
       <section className={styles.encabezado}>
         <div>
@@ -178,6 +182,7 @@ export default function UsuariosPage() {
           <table className={styles.tabla}>
             <thead>
               <tr>
+                <th>Imagen</th>
                 <th>Nombre</th>
                 <th>Correo</th>
                 <th>Rol</th>
@@ -187,12 +192,34 @@ export default function UsuariosPage() {
             </thead>
             <tbody>
               {cargando ? (
-                <tr><td colSpan={5} className={styles.estadoTabla}>Cargando usuarios...</td></tr>
+                <tr><td colSpan={6} className={styles.estadoTabla}>Cargando usuarios...</td></tr>
               ) : usuariosFiltrados.length === 0 ? (
-                <tr><td colSpan={5} className={styles.estadoTabla}>No se encontraron usuarios.</td></tr>
+                <tr><td colSpan={6} className={styles.estadoTabla}>No se encontraron usuarios.</td></tr>
               ) : (
                 usuariosFiltrados.map((usuario) => (
                   <tr key={usuario.id}>
+                    <td>
+                      <div className={styles.avatarMini}>
+                        {usuario.foto_url ? (
+                          <img
+                            alt={usuario.nombre}
+                            src={usuario.foto_url}
+                            style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => {
+                              console.error("Error cargando imagen para:", usuario.nombre, usuario.foto_url);
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.textContent = usuario.nombre.charAt(0).toUpperCase();
+                              }
+                            }}
+                          />
+                        ) : (
+                          usuario.nombre.charAt(0).toUpperCase()
+                        )}
+                      </div>
+                    </td>
                     <td>{usuario.nombre}</td>
                     <td>{usuario.correo}</td>
                     <td>{etiquetaRol(usuario.rol, usuario.genero)}</td>
@@ -266,5 +293,6 @@ export default function UsuariosPage() {
         </div>
       )}
     </LayoutDashboard>
+    </div>
   );
 }

@@ -83,6 +83,26 @@
 
 .acciones { display: flex; gap: 8px; }
 
+.avatarMini {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-azul);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.avatarMini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .botonSecundario,
 .botonEliminar {
   padding: 7px 10px;

@@ -19,23 +19,23 @@ fun NavGraphBuilder.grafoPrincipal(
     }
 
     composable(Rutas.PRODUCTOS) {
-        ProductosScreen()
+        ProductosScreen(navController)
     }
 
     composable(Rutas.OFERTAS) {
-        OfertasScreen()
+        OfertasScreen(navController)
     }
 
     composable(Rutas.CARRITO) {
-        CarritoScreen()
+        CarritoScreen(navController)
     }
 
     composable(Rutas.PEDIDOS) {
-        MisPedidosScreen()
+        MisPedidosScreen(navController)
     }
 
     composable(Rutas.PERFIL) {
-        PerfilScreen()
+        PerfilScreen(navController)
     }
 
 }
